@@ -24,8 +24,15 @@ builder.Services.Scan(scan =>
         .AddClasses()
         .AsMatchingInterface());
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(x => x.LoginPath = "/admin/login");
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(a =>
+{
+    a.LoginPath = "/admin/Login";
+});
 
 var app = builder.Build();
 
