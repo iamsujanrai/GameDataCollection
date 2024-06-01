@@ -12,6 +12,28 @@ namespace GameDataCollection.Services
             _gameRecordRepository = gameRecordRepository;
         }
 
+        public Task<List<GameRecord>> GetAll()
+        {
+            try
+            {
+                return _gameRecordRepository.GetAll();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<GameRecord>> GetNonExpiredGameRecordsAsync()
+        {
+            return await _gameRecordRepository.GetNonExpiredGameRecordsAsync();
+        }
+
+        public async Task<IEnumerable<GameRecord>> GetExpiredGameRecordsAsync()
+        {
+            return await _gameRecordRepository.GetExpiredGameRecordsAsync();
+        }
+
         public async Task Save(GameRecord gameRecord)
         {
 			try

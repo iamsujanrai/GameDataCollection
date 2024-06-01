@@ -4,6 +4,12 @@ namespace GameDataCollection.Models
 {
     public class GameRecord
     {
+        public GameRecord()
+        {
+            CreatedDateTime = DateTime.Now;
+            ExpiryDateTime = CreatedDateTime.AddMonths(1);
+        }
+
         public int Id { get; set; }
         public required string FullName { get; set; }
         public required string PhoneNumber { get; set; }
@@ -13,9 +19,12 @@ namespace GameDataCollection.Models
         public string? GameUserId { get; set; }
         public int StateId { get; set; }
         public int GameId { get; set; }
+        public DateTime CreatedDateTime { get; protected set; }
+        public DateTime ExpiryDateTime { get; protected set; }
+
         [ForeignKey(nameof(StateId))]
-        public required virtual State State { get; set; }
+        public virtual State? State { get; set; }
         [ForeignKey(nameof(GameId))]
-        public required virtual Game Game { get; set; }
+        public virtual Game? Game { get; set; }
     }
 }

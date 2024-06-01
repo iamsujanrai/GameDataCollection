@@ -1,0 +1,74 @@
+﻿@model GameDataCollection.ViewModels.ReportViewModel
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Expired Records</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="nonexpiredtbl" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>State</th>
+                    <th>Refferred By</th>
+                    <th>Email</th>
+                    <th>Facebook Name</th>
+                    <th>Game</th>
+                    <th>Game Id</th>
+                    <th>Entry Date</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (GameRecord item in Model.GameRecords)
+                {
+                    <tr>
+                        <td>@item.FullName</td>
+                        <td>@item.PhoneNumber</td>
+                        <td>@item.State.Name</td>
+                        <td>@item.RefferedBy</td>
+                        <td>@item.Email</td>
+                        <td>@item.FacebookName</td>
+                        <td>@item.Game.Name</td>
+                        <td>@item.GameUserId</td>
+                        <td>@item.CreatedDateTime</td>
+                        <td>@item.ExpiryDateTime</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>State</th>
+                    <th>Refferred By</th>
+                    <th>Email</th>
+                    <th>Facebook Name</th>
+                    <th>Game</th>
+                    <th>Game Id</th>
+                    <th>Entry Date</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->
+@section scripts {
+    <script>
+        $(function () {
+            $('#nonexpiredtbl').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

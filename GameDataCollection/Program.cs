@@ -1,4 +1,9 @@
 using GameDataCollection.DbContext;
+using GameDataCollection.Models;
+using GameDataCollection.Repositories;
+using GameDataCollection.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +13,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<UserDbContext>(options =>
               options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("GameDataCollection").CommandTimeout(4000)), ServiceLifetime.Transient);
 
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = true;
+}).AddEntityFrameworkStores<UserDbContext>()
+  .AddDefaultTokenProviders();
+
+builder.Services.Scan(scan =>
+    scan.FromAssembliesOf(typeof(IGameRecordService), typeof(IGameRecordRepository))
+        .AddClasses()
+        .AsMatchingInterface());
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(x => x.LoginPath = "/admin/login");
 
 var app = builder.Build();
 
@@ -24,10 +42,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=GameRecord}/{action=Create}/{id?}");
 
 app.Run();

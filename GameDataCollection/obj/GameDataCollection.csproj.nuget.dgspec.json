@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\PersonalProjects\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj": {}
+    "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj": {}
   },
   "projects": {
-    "E:\\PersonalProjects\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj": {
+    "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\PersonalProjects\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj",
+        "projectUniqueName": "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj",
         "projectName": "GameDataCollection",
-        "projectPath": "E:\\PersonalProjects\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj",
+        "projectPath": "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj",
         "packagesPath": "C:\\Users\\sznro\\.nuget\\packages\\",
-        "outputPath": "E:\\PersonalProjects\\GameDataCollection\\GameDataCollection\\obj\\",
+        "outputPath": "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\sznro\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -70,6 +70,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "Scrutor.AspNetCore": {
+              "target": "Package",
+              "version": "[3.3.0, )"
             },
             "Z.EntityFramework.Extensions.EFCore": {
               "target": "Package",
