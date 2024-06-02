@@ -50,18 +50,16 @@ namespace GameDataCollection.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm)
         {
             if (!ModelState.IsValid)
             {
                 IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
             }
-            var user = await _userManager.FindByNameAsync(vm.Username);
-            if (user == null)
-            {
-                throw new Exception("Invalid username or password");
-            }
+            var user = await _userManager.FindByNameAsync(vm.Username) ?? throw new Exception("Invalid username or password");
             var result = await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, true, false);
 
             if (!result.Succeeded)
@@ -83,6 +81,35 @@ namespace GameDataCollection.Controllers
             });
 
             return RedirectToAction("Index", "Admin");
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) as string;
+            if (userId == null)
+            {
+                throw new Exception("User id is null");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("User not found");
+            var result = await _userManager.ChangePasswordAsync(user, vm.OldPassword, vm.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                throw new Exception("Password mismatch");
+            }
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return View();
         }
     }
 }
