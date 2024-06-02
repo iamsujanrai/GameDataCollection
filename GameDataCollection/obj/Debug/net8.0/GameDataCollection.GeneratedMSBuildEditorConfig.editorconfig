@@ -26,6 +26,10 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ2hhbmdlUGFzc3dvcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/ExpiredReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRXhwaXJlZFJlcG9ydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
