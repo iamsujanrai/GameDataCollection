@@ -97,6 +97,38 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="/Game/Index" class="nav-link">
+                                <i class="nav-icon fas fa-eye"></i>
+                                <p>
+                                    Game List
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Game/Create" class="nav-link">
+                                <i class="nav-icon fas fa-plus"></i>
+                                <p>
+                                    Add Game
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/EmailSetup/Index" class="nav-link">
+                                <i class="nav-icon fas fa-eye"></i>
+                                <p>
+                                    Email List
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/EmailSetup/Create" class="nav-link">
+                                <i class="nav-icon fas fa-plus"></i>
+                                <p>
+                                    Add Email
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -189,6 +221,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await Component.InvokeAsync("Notyf")
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

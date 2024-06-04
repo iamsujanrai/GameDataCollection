@@ -508,3 +508,5 @@ E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\obj\Debug\
 E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.pdb
 E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.genruntimeconfig.cache
 E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\obj\Debug\net8.0\ref\GameDataCollection.dll
+E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\bin\Debug\net8.0\AspNetCoreHero.ToastNotification.Views.dll
+E:\PersonalProjects\C#\Personal\GameDataCollection\GameDataCollection\bin\Debug\net8.0\AspNetCoreHero.ToastNotification.dll

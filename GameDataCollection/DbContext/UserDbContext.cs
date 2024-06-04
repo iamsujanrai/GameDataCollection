@@ -29,5 +29,6 @@ namespace GameDataCollection.DbContext
         public DbSet<Game> Games { get; set; }
         public DbSet<State> States { get; set; }
         public DbSet<GameRecord> GamesRecord { get; set; }
+        public DbSet<Email> Emails { get; set; }
     }
 }

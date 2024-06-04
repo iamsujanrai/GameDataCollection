@@ -18,7 +18,7 @@ namespace GameDataCollection.Models
         public string? FacebookName { get; set; }
         public string? GameUserId { get; set; }
         public int StateId { get; set; }
-        public int GameId { get; set; }
+        public long GameId { get; set; }
         public DateTime CreatedDateTime { get; protected set; }
         public DateTime ExpiryDateTime { get; protected set; }
 

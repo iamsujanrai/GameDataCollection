@@ -1,0 +1,50 @@
+﻿@model GameDataCollection.ViewModels.GameIndexViewModel;
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Games</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="gamestbl" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Games)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td><a href="/Game/Delete?id=@item.Id"><i class="nav-icon fas fa-trash"></i> Delete</a></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->
+@section scripts {
+    <script>
+        $(function () {
+            $('#gamestbl').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

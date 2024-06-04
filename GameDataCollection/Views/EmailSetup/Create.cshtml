@@ -1,0 +1,31 @@
+﻿@model GameDataCollection.ViewModels.EmailSetupViewModel
+
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-6">
+        <!-- general form elements -->
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Email Information</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form role="form" asp-action="Create" method="post">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="MemberEmail">Member Email</label>
+                        <input type="email" class="form-control" asp-for="MemberEmail" />
+                        <span asp-validation-for="MemberEmail" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.row -->
+</div>

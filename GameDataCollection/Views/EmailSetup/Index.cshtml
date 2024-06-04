@@ -1,0 +1,53 @@
+﻿@model GameDataCollection.ViewModels.EmailIndexViewModel;
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Games</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="gamestbl" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Member Email</th>
+                    <th>Active Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Emails)
+                {
+                    <tr>
+                        <td>@item.MemberEmail</td>
+                        <td>@item.IsActive</td>
+                        <td><a href="/EmailSetup/ToggleStatus?id=@item.Id"><i class="nav-icon fas fa-toggle"></i> Toggle</a></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Member Email</th>
+                    <th>Active Status</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->
+@section scripts {
+    <script>
+        $(function () {
+            $('#gamestbl').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+            });
+        });
+    </script>
+}

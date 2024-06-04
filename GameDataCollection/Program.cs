@@ -1,3 +1,4 @@
+using AspNetCoreHero.ToastNotification;
 using GameDataCollection.DbContext;
 using GameDataCollection.Models;
 using GameDataCollection.Repositories;
@@ -33,6 +34,8 @@ builder.Services.AddAuthentication(options =>
 {
     a.LoginPath = "/admin/Login";
 });
+builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDismissable = true; config.Position = NotyfPosition.TopRight; });
+
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿using GameDataCollection.DbContext;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using GameDataCollection.DbContext;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
@@ -13,11 +14,13 @@ namespace GameDataCollection.Controllers
     {
         private readonly UserDbContext _context;
         private readonly IGameRecordService _gameRecordService;
+        private readonly INotyfService _notyf;
 
-        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService)
+        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf)
         {
             _context = context;
             _gameRecordService = gameRecordService;
+            _notyf = notyf;
         }
 
         [HttpGet]
@@ -39,10 +42,12 @@ namespace GameDataCollection.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                    _notyf.Error("Internal Error Occurred!!");
                 }
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
+
+                _notyf.Success("Record successfully added.");
                 return View(vm);
             }
             catch (Exception)

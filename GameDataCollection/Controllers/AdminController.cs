@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel;
 using System.Security.Claims;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace GameDataCollection.Controllers
 {
@@ -18,12 +19,14 @@ namespace GameDataCollection.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly IGameRecordService _gameRecordService;
+        private readonly INotyfService _notyf;
 
-        public AdminController(SignInManager<User> signInManager, UserManager<User> userManager, IGameRecordService gameRecordService)
+        public AdminController(SignInManager<User> signInManager, UserManager<User> userManager, IGameRecordService gameRecordService, INotyfService notyf)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _gameRecordService = gameRecordService;
+            _notyf = notyf;
         }
 
         public IActionResult Index()
@@ -57,14 +60,21 @@ namespace GameDataCollection.Controllers
         {
             if (!ModelState.IsValid)
             {
-                IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+                _notyf.Error("Internal Error Occurred!!");
+                return View(vm);
             }
-            var user = await _userManager.FindByNameAsync(vm.Username) ?? throw new Exception("Invalid username or password");
+            var user = await _userManager.FindByNameAsync(vm.Username);
+            if (user is null)
+            {
+                _notyf.Error("Invalid username or password!!");
+                return View(vm);
+            }
+            
             var result = await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, true, false);
-
             if (!result.Succeeded)
             {
-                throw new Exception("Invalid username or password");
+                _notyf.Error("Invalid username or password!!");
+                return View(vm);
             }
  
             var claims = new List<Claim>() {
@@ -98,7 +108,8 @@ namespace GameDataCollection.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) as string;
             if (userId == null)
             {
-                throw new Exception("User id is null");
+                _notyf.Error("Cannot find logged in user id!!");
+                return View(vm);
             }
 
             var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("User not found");
@@ -106,9 +117,11 @@ namespace GameDataCollection.Controllers
 
             if (!result.Succeeded)
             {
-                throw new Exception("Password mismatch");
+                _notyf.Error("Password mismatch!!");
+                return View(vm);
             }
             await _signInManager.SignInAsync(user, isPersistent: false);
+            _notyf.Success("Password changed successfully.");
             return View();
         }
     }

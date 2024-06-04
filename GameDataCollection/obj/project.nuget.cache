@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "eGHHAUCDGviJoT6OXwWIXoAcp5EDwtGFHikOBlidN4us6zXilQXDPKYZ7wyOsySHJGrklYw7IsxWHPrazVNVow==",
+  "dgSpecHash": "UTZ/PqIps/72Hme/Z3IzBW/b3v7lUDPPMYOm8z3oAmvKmg8i+U0BHdieQMXFqi/Gx4z5ZbcKgNa/hzOtLhiHLw==",
   "success": true,
   "projectFilePath": "E:\\PersonalProjects\\C#\\Personal\\GameDataCollection\\GameDataCollection\\GameDataCollection.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\sznro\\.nuget\\packages\\aspnetcorehero.toastnotification\\1.1.0\\aspnetcorehero.toastnotification.1.1.0.nupkg.sha512",
     "C:\\Users\\sznro\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\sznro\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\sznro\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
