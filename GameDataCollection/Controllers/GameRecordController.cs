@@ -24,6 +24,12 @@ namespace GameDataCollection.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             var vm = new GameRecordViewModel
@@ -47,8 +53,13 @@ namespace GameDataCollection.Controllers
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
 
-                _notyf.Success("Record successfully added.");
-                return View(vm);
+                _notyf.Success("Thanks for register");
+                var newVm = new GameRecordViewModel
+                {
+                    Games = GetGames(),
+                    States = GetStates()
+                };
+                return RedirectToAction("Create");
             }
             catch (Exception)
             {
