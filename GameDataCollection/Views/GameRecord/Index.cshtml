@@ -10,52 +10,36 @@
         justify-content: center;
         align-items: center;
         background-color: black;
+        overflow: hidden; /* Prevents overflow issues */
     }
 
     .gif-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
-        height: 100%;
+        width: 100vw; /* Full viewport width */
+        height: 100vh; /* Full viewport height */
+        position: relative;
     }
 
         .gif-container img {
-            max-width: 100%;
-            max-height: 100%;
-            height: auto;
-            width: auto;
+            width: 100%;
+            
+            object-fit: cover;
         }
 
     .invisible-button {
         position: absolute;
-        top: 52%;
-        left: 58%;
+        top: 57%;
+        left: 75%;
         transform: translate(-50%, -50%);
-        width: 160px; /* Adjust size as needed */
-        height: 55px; /* Adjust size as needed */
+        width: 35%; /* Adjust size as needed */
+        height: 18%; /* Adjust size as needed */
         background-color: transparent;
         border: none;
         cursor: pointer;
         outline: none;
     }
-    .center-button {
-        position: absolute;
-        top: 52%;
-        left: 58%;
-        transform: translate(-50%, -50%);
-        padding: 10px 20px;
-        font-size: 16px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-        .center-button:hover {
-            background-color: rgba(0, 0, 0, 0.9); /* Darker on hover */
-        }
 </style>
 
 <div class="gif-container">

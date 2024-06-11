@@ -41,6 +41,7 @@ namespace GameDataCollection.Services
                 ArgumentNullException.ThrowIfNull(gameRecord);
 
                 await _gameRecordRepository.InsertAsync(gameRecord);
+
 			}
 			catch (Exception)
 			{

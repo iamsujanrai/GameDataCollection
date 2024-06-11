@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using GameDataCollection.DbContext;
+using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
@@ -15,12 +16,14 @@ namespace GameDataCollection.Controllers
         private readonly UserDbContext _context;
         private readonly IGameRecordService _gameRecordService;
         private readonly INotyfService _notyf;
+        private readonly IEmailSetupService _emailSetupService;
 
-        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf)
+        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf,IEmailSetupService emailSetupService)
         {
             _context = context;
             _gameRecordService = gameRecordService;
             _notyf = notyf;
+            _emailSetupService = emailSetupService;
         }
 
         [HttpGet]
@@ -54,6 +57,12 @@ namespace GameDataCollection.Controllers
                 await _gameRecordService.Save(gameRecord);
 
                 _notyf.Success("Thanks for register");
+                EmailSender.EmailSend(vm.Email, "Thank you for register",EmailSender.RegisterTemplate(vm.FullName));
+                var listOfEmail= _emailSetupService.GetAll().Result.Where(a=>a.IsActive).ToList();
+                foreach (var item in listOfEmail)
+                {
+                    EmailSender.EmailSend(item.MemberEmail, $"{vm.FullName} Register sucessfully", EmailSender.RegisterTemplate(vm.FullName));
+                }
                 var newVm = new GameRecordViewModel
                 {
                     Games = GetGames(),
