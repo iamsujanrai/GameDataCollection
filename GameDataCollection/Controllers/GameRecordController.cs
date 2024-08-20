@@ -75,6 +75,59 @@ namespace GameDataCollection.Controllers
                 throw;
             }
         }
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var vm = new GameRecordViewModel
+            {
+                Games = GetGames(),
+                States = GetStates()
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(GameRecordViewModel vm)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    _notyf.Error("Internal Error Occurred!!");
+                }
+                var gameRecord = GetGameRecordFromVM(vm);
+                await _gameRecordService.Save(gameRecord);
+
+                _notyf.Success("Thanks for register");
+                EmailSender.EmailSend(vm.Email, "Thank you for register", EmailSender.RegisterTemplate(vm.FullName));
+                var listOfEmail = _emailSetupService.GetAll().Result.Where(a => a.IsActive).ToList();
+                foreach (var item in listOfEmail)
+                {
+                    EmailSender.EmailSend(item.MemberEmail, $"{vm.FullName} Register sucessfully", EmailSender.RegisterTemplate(vm.FullName));
+                }
+                var newVm = new GameRecordViewModel
+                {
+                    Games = GetGames(),
+                    States = GetStates()
+                };
+                return RedirectToAction("Create");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var vm = new GameRecordViewModel
+            {
+                Games = GetGames(),
+                States = GetStates()
+            };
+            return View(vm);
+        }
 
         private static GameRecord GetGameRecordFromVM(GameRecordViewModel vm)
         {

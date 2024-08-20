@@ -3,6 +3,14 @@
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Expired Records</h3>
+        <div class="input-group float-right" style="width: 300px;">
+            <input id="search-name" type="text" class="form-control" placeholder="Search by Full Name">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -12,7 +20,7 @@
                     <th>Full Name</th>
                     <th>Phone Number</th>
                     <th>State</th>
-                    <th>Refferred By</th>
+                    <th>Referred By</th>
                     <th>Email</th>
                     <th>Facebook Name</th>
                     <th>Game</th>
@@ -43,7 +51,7 @@
                     <th>Full Name</th>
                     <th>Phone Number</th>
                     <th>State</th>
-                    <th>Refferred By</th>
+                    <th>Referred By</th>
                     <th>Email</th>
                     <th>Facebook Name</th>
                     <th>Game</th>
@@ -60,14 +68,19 @@
 @section scripts {
     <script>
         $(function () {
-            $('#nonexpiredtbl').DataTable({
+            var table = $('#nonexpiredtbl').DataTable({
                 "paging": true,
                 "lengthChange": false,
-                "searching": false,
-                "ordering": true,
+                "searching": false,  // Keep this true to enable global search
+                "ordering": false,
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
+            });
+
+            // Custom search for Full Name
+            $('#search-name').on('keyup', function () {
+                table.column(0).search(this.value).draw();
             });
         });
     </script>
