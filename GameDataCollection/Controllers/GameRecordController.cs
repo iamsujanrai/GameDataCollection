@@ -117,12 +117,6 @@ namespace GameDataCollection.Controllers
                 {
                     _notyf.Error("Internal Error Occurred!!");
                 }
-                var recordExists = _gameRecordService.IsRecordExists(vm);
-                if (recordExists != null)
-                {
-                    _notyf.Error("Record already exist!!");
-                    return RedirectToAction("Create");
-                }
                 var gameRecord = GetGameRecordFromVM(vm);
                 _gameRecordService.Edit(gameRecord);
                 _notyf.Success("Edit Sucessfully");
