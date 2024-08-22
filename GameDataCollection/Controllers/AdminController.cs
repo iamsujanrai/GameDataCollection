@@ -46,7 +46,7 @@ namespace GameDataCollection.Controllers
             };
             return View(vm);
         }
-
+       
         [AllowAnonymous]
         public IActionResult Login()
         {

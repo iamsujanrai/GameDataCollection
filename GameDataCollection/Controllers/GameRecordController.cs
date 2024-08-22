@@ -53,6 +53,13 @@ namespace GameDataCollection.Controllers
                 {
                     _notyf.Error("Internal Error Occurred!!");
                 }
+
+                var recordExists = _gameRecordService.IsRecordExists(vm);
+                if (recordExists != null)
+                {
+                    _notyf.Error("Record already exist!!");
+                    return RedirectToAction("Create");
+                }
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
 
@@ -74,6 +81,64 @@ namespace GameDataCollection.Controllers
             {
                 throw;
             }
+        }
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var record = _gameRecordService.getById(id);
+            var vm=Copy(record);
+            return View(vm);
+        }
+        private GameRecordViewModel Copy(GameRecord record)
+        {
+            var gameRecordVm = new GameRecordViewModel()
+            {
+                Email = record.Email,
+                FacebookName=record.FacebookName,
+                FullName=record.FullName,
+                GameId=record.GameId,
+                GameUserId=record.GameUserId,
+                PhoneNumber=record.PhoneNumber,
+                RefferedBy=record.RefferedBy,
+                StateId=record.StateId,
+                Games=GetGames(),
+                States=GetStates()
+            };
+            return gameRecordVm;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(GameRecordViewModel vm)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    _notyf.Error("Internal Error Occurred!!");
+                }
+                var gameRecord = GetGameRecordFromVM(vm);
+                _gameRecordService.Edit(gameRecord);
+                _notyf.Success("Edit Sucessfully");
+                return Redirect("/admin/index");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var vm = new GameRecordViewModel
+            {
+                Games = GetGames(),
+                States = GetStates()
+            };
+            var record = _gameRecordService.getById(id);
+            _gameRecordService.Delete(record);
+            _notyf.Success("Deleted sucessfully");
+            return Redirect("/admin/index");
         }
 
         private static GameRecord GetGameRecordFromVM(GameRecordViewModel vm)

@@ -11,7 +11,7 @@ namespace GameDataCollection.ViewModels
         public string? FacebookName { get; set; }
         public string? GameUserId { get; set; }
         public int StateId { get; set; }
-        public int GameId { get; set; }
+        public long GameId { get; set; }
 
         public IEnumerable<SelectListItem>? States { get; set; }
         public IEnumerable<SelectListItem>? Games { get; set; }

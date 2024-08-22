@@ -1,5 +1,6 @@
 ﻿using GameDataCollection.Models;
 using GameDataCollection.Repositories;
+using GameDataCollection.ViewModels;
 
 namespace GameDataCollection.Services
 {
@@ -47,6 +48,57 @@ namespace GameDataCollection.Services
 			{
 				throw;
 			}
+        }
+
+        public void Edit(GameRecord record)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(record);
+
+                _gameRecordRepository.Update(record);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void Delete(GameRecord record)
+        {
+            try
+            {
+               _gameRecordRepository.Delete(record);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public GameRecord getById(int id)
+        {
+            try
+            {
+                return _gameRecordRepository.GetQueryable().Where(a => a.Id.Equals(id)).SingleOrDefault();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public GameRecord IsRecordExists(GameRecordViewModel record)
+        {
+            try
+            {
+                return _gameRecordRepository.GetQueryable().Where(a => a.Email.ToLower().Equals(record.Email.ToLower()) || a.PhoneNumber.Equals(record.PhoneNumber)).FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
