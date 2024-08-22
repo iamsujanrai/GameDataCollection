@@ -40,10 +40,10 @@
                         <td>@item.CreatedDateTime</td>
                         <td>@item.ExpiryDateTime</td>
                         <td>
-                            <a href="@Url.Action("Edit", "Admin", new { id = item.Id })" class="btn btn-sm btn-primary">
+                            <a href="@Url.Action("Edit", "GameRecord", new { id = item.Id })" class="btn btn-sm btn-primary">
                                 Edit
                             </a>
-                            <a href="@Url.Action("Delete", "Admin", new { id = item.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this record?');">
+                            <a href="@Url.Action("Delete", "GameRecord", new { id = item.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this record?');">
                                 Delete
                             </a>
                         </td> <!-- Action buttons for Edit and Delete -->

@@ -54,6 +54,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Private/GameDataCollection/GameDataCollection/Views/GameRecord/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Private/GameDataCollection/GameDataCollection/Views/GameRecord/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

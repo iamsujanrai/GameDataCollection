@@ -53,6 +53,13 @@ namespace GameDataCollection.Controllers
                 {
                     _notyf.Error("Internal Error Occurred!!");
                 }
+
+                var recordExists = _gameRecordService.IsRecordExists(vm);
+                if (recordExists != null)
+                {
+                    _notyf.Error("Record already exist!!");
+                    return RedirectToAction("Create");
+                }
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
 
@@ -78,12 +85,26 @@ namespace GameDataCollection.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var vm = new GameRecordViewModel
-            {
-                Games = GetGames(),
-                States = GetStates()
-            };
+            var record = _gameRecordService.getById(id);
+            var vm=Copy(record);
             return View(vm);
+        }
+        private GameRecordViewModel Copy(GameRecord record)
+        {
+            var gameRecordVm = new GameRecordViewModel()
+            {
+                Email = record.Email,
+                FacebookName=record.FacebookName,
+                FullName=record.FullName,
+                GameId=record.GameId,
+                GameUserId=record.GameUserId,
+                PhoneNumber=record.PhoneNumber,
+                RefferedBy=record.RefferedBy,
+                StateId=record.StateId,
+                Games=GetGames(),
+                States=GetStates()
+            };
+            return gameRecordVm;
         }
 
         [HttpPost]
@@ -96,22 +117,16 @@ namespace GameDataCollection.Controllers
                 {
                     _notyf.Error("Internal Error Occurred!!");
                 }
-                var gameRecord = GetGameRecordFromVM(vm);
-                await _gameRecordService.Save(gameRecord);
-
-                _notyf.Success("Thanks for register");
-                EmailSender.EmailSend(vm.Email, "Thank you for register", EmailSender.RegisterTemplate(vm.FullName));
-                var listOfEmail = _emailSetupService.GetAll().Result.Where(a => a.IsActive).ToList();
-                foreach (var item in listOfEmail)
+                var recordExists = _gameRecordService.IsRecordExists(vm);
+                if (recordExists != null)
                 {
-                    EmailSender.EmailSend(item.MemberEmail, $"{vm.FullName} Register sucessfully", EmailSender.RegisterTemplate(vm.FullName));
+                    _notyf.Error("Record already exist!!");
+                    return RedirectToAction("Create");
                 }
-                var newVm = new GameRecordViewModel
-                {
-                    Games = GetGames(),
-                    States = GetStates()
-                };
-                return RedirectToAction("Create");
+                var gameRecord = GetGameRecordFromVM(vm);
+                _gameRecordService.Edit(gameRecord);
+                _notyf.Success("Edit Sucessfully");
+                return Redirect("/admin/index");
             }
             catch (Exception)
             {
@@ -126,7 +141,10 @@ namespace GameDataCollection.Controllers
                 Games = GetGames(),
                 States = GetStates()
             };
-            return View(vm);
+            var record = _gameRecordService.getById(id);
+            _gameRecordService.Delete(record);
+            _notyf.Success("Deleted sucessfully");
+            return Redirect("/admin/index");
         }
 
         private static GameRecord GetGameRecordFromVM(GameRecordViewModel vm)
