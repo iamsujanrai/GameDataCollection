@@ -39,6 +39,10 @@ namespace GameDataCollection.Repositories
         {
             return _appDbContext.Set<T>().Find(id);
         }
+        public T GetById(int id)
+        {
+            return _appDbContext.Set<T>().Find(id);
+        }
 
         public T Insert(T entity)
         {

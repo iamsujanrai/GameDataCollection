@@ -4,6 +4,7 @@ namespace GameDataCollection.ViewModels
 {
     public class GameRecordViewModel
     {
+        public long Id { get; set; }
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public string? RefferedBy { get; set; }

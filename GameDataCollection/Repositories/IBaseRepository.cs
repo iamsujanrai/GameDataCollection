@@ -14,6 +14,7 @@ namespace GameDataCollection.Repositories
         void UpdateRange(List<T> entities);
         Task<List<T>> GetAll();
         T GetById(long id);
+        T GetById(int id);
         IQueryable<T> GetQueryable();
 
         List<T> GetAll(bool asNoTracking = false);
