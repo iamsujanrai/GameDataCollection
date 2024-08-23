@@ -17,75 +17,75 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = GameDataCollection
 build_property.RootNamespace = GameDataCollection
-build_property.ProjectDir = D:\Private\GameDataCollection\GameDataCollection\
+build_property.ProjectDir = C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\Private\GameDataCollection\GameDataCollection
+build_property.MSBuildProjectDirectory = C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Admin/ChangePassword.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/ChangePassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ2hhbmdlUGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Admin/ExpiredReport.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/ExpiredReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRXhwaXJlZFJlcG9ydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Admin/Index.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Admin/Login.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/EmailSetup/Create.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/EmailSetup/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxTZXR1cFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/EmailSetup/Index.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/EmailSetup/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW1haWxTZXR1cFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/GameRecord/Create.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/GameRecord/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/GameRecord/Edit.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/GameRecord/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/GameRecord/Index.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/GameRecord/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVJlY29yZFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Game/Create.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Game/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Game/Index.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Game/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Shared/Error.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/_ViewImports.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/_ViewStart.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Private/GameDataCollection/GameDataCollection/Views/Shared/_Layout.cshtml]
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-qs9zp789vg
