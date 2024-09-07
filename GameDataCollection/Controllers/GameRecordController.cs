@@ -93,6 +93,7 @@ namespace GameDataCollection.Controllers
         {
             var gameRecordVm = new GameRecordViewModel()
             {
+                Id=record.Id,
                 Email = record.Email,
                 FacebookName=record.FacebookName,
                 FullName=record.FullName,
@@ -106,6 +107,18 @@ namespace GameDataCollection.Controllers
             };
             return gameRecordVm;
         }
+        private void CopyFromGameRecordViewModel(GameRecordViewModel vm, GameRecord record)
+        {
+            record.Id = (int)vm.Id;
+            record.FullName = vm.FullName;
+            record.PhoneNumber = vm.PhoneNumber;
+            record.RefferedBy = vm.RefferedBy;
+            record.Email = vm.Email;
+            record.FacebookName = vm.FacebookName;
+            record.GameUserId = vm.GameUserId;
+            record.GameId = vm.GameId;
+            record.StateId = vm.StateId;
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -117,8 +130,9 @@ namespace GameDataCollection.Controllers
                 {
                     _notyf.Error("Internal Error Occurred!!");
                 }
-                var gameRecord = GetGameRecordFromVM(vm);
-                _gameRecordService.Edit(gameRecord);
+                var record = _gameRecordService.getById((int)vm.Id);
+                CopyFromGameRecordViewModel(vm,record);
+                _gameRecordService.Edit(record);
                 _notyf.Success("Edit Sucessfully");
                 return Redirect("/admin/index");
             }

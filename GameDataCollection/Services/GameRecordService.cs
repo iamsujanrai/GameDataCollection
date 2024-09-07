@@ -81,7 +81,8 @@ namespace GameDataCollection.Services
         {
             try
             {
-                return _gameRecordRepository.GetQueryable().Where(a => a.Id.Equals(id)).SingleOrDefault();
+                var a = _gameRecordRepository.GetById(id);
+                return _gameRecordRepository.GetQueryable().Where(a=>a.Id.Equals(id)).SingleOrDefault();
             }
             catch (Exception)
             {
