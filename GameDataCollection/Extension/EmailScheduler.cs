@@ -28,12 +28,13 @@ namespace GameDataCollection.Extension
                 // Your logic here
                 return Task.CompletedTask;
             }
+
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // Schedule the task to run every X seconds or minutes
-            _timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromDays(1));
+            _timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.CompletedTask;
         }
@@ -60,118 +61,63 @@ namespace GameDataCollection.Extension
         {
             var sb = new StringBuilder();
             sb.Append(@"
-            <div class='card-body'>
-                <style>
-                    /* Card body styling */
-                    .card-body {
-                        padding: 20px;
-                        background-color: #f9f9f9;
-                    }
-
-                    /* Table styling */
-                    .table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 1rem;
-                        background-color: #fff;
-                    }
-
-                    /* Table header styling */
-                    .table th {
-                        background-color: #007bff; /* Change this color to fit your theme */
-                        color: white;
-                        text-align: center;
-                        padding: 10px;
-                    }
-
-                    /* Table body row styling */
-                    .table td {
-                        padding: 10px;
-                        border: 1px solid #dee2e6;
-                        text-align: center;
-                    }
-
-                    /* Alternate row colors */
-                    .table-striped tbody tr:nth-of-type(odd) {
-                        background-color: #f2f2f2;
-                    }
-
-                    /* Add hover effect on rows */
-                    .table-hover tbody tr:hover {
-                        background-color: #d6e9f9;
-                    }
-
-                    /* Table footer styling */
-                    .table tfoot th {
-                        background-color: #f1f1f1;
-                        color: #333;
-                        padding: 10px;
-                        text-align: center;
-                    }
-
-                    /* Responsive table */
-                    @media (max-width: 768px) {
-                        .table th, .table td {
-                            font-size: 12px;
-                            padding: 8px;
-                        }
-                    }
-                </style>
-                <table id='nonexpiredtbl' class='table table-bordered table-striped'>
-                    <thead>
-                        <tr>
-                            <th>Full Name</th>
-                            <th>Phone Number</th>
-                            <th>State</th>
-                            <th>Referred By</th>
-                            <th>Email</th>
-                            <th>Facebook Name</th>
-                            <th>Game</th>
-                            <th>Game Id</th>
-                            <th>Entry Date</th>
-                            <th>Expiry Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>");
-
-                        foreach (var item in gameRecords)
-                        {
-                            sb.Append($@"
+    <div class='card-body' style='padding: 20px; background-color: #f9f9f9;'>
+        <table id='nonexpiredtbl' style='width: 100%; border-collapse: collapse; margin-bottom: 1rem; background-color: #fff;'>
+            <thead>
                 <tr>
-                    <td>{item.FullName}</td>
-                    <td>{item.PhoneNumber}</td>
-                    <td>{item.State.Name}</td>
-                    <td>{item.RefferedBy}</td>
-                    <td>{item.Email}</td>
-                    <td>{item.FacebookName}</td>
-                    <td>{item.Game.Name}</td>
-                    <td>{item.GameUserId}</td>
-                    <td>{item.CreatedDateTime:yyyy-MM-dd}</td>
-                    <td>{item.ExpiryDateTime:yyyy-MM-dd}</td>
-                </tr>");
-                        }
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Full Name</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Phone Number</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>State</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Referred By</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Email</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Facebook Name</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Game</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Game Id</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Entry Date</th>
+                    <th style='background-color: #007bff; color: white; text-align: center; padding: 10px;'>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody>");
 
-                        sb.Append(@"
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>Full Name</th>
-                            <th>Phone Number</th>
-                            <th>State</th>
-                            <th>Referred By</th>
-                            <th>Email</th>
-                            <th>Facebook Name</th>
-                            <th>Game</th>
-                            <th>Game Id</th>
-                            <th>Entry Date</th>
-                            <th>Expiry Date</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>");
+            foreach (var item in gameRecords)
+            {
+                sb.Append($@"
+            <tr>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.FullName}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.PhoneNumber}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.State.Name}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.RefferedBy}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.Email}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.FacebookName}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.Game.Name}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.GameUserId}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.CreatedDateTime:yyyy-MM-dd}</td>
+                <td style='padding: 10px; border: 1px solid #dee2e6; text-align: center;'>{item.ExpiryDateTime:yyyy-MM-dd}</td>
+            </tr>");
+            }
+
+            sb.Append(@"
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Full Name</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Phone Number</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>State</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Referred By</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Email</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Facebook Name</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Game</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Game Id</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Entry Date</th>
+                    <th style='background-color: #f1f1f1; color: #333; padding: 10px; text-align: center;'>Expiry Date</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>");
 
             return sb.ToString();
         }
+
 
         public void SendDailyEmail(IEmailSetupService _emailSetupService, IGameRecordService _gameRecordService)
         {
