@@ -46,7 +46,15 @@ namespace GameDataCollection.Controllers
             };
             return View(vm);
         }
-       
+        public IActionResult AllReport()
+        {
+            var vm = new ReportViewModel
+            {
+                GameRecords = _gameRecordService.GetAll().Result.OrderByDescending(a=>a.Id).ToList()
+            };
+            return View(vm);
+        }
+
         [AllowAnonymous]
         public IActionResult Login()
         {
