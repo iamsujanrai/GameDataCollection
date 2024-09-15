@@ -102,6 +102,8 @@ namespace GameDataCollection.Controllers
                 PhoneNumber=record.PhoneNumber,
                 RefferedBy=record.RefferedBy,
                 StateId=record.StateId,
+                CreatedDateTime=record.CreatedDateTime,
+                ExpiryDateTime=record.ExpiryDateTime,
                 Games=GetGames(),
                 States=GetStates()
             };
@@ -118,6 +120,8 @@ namespace GameDataCollection.Controllers
             record.GameUserId = vm.GameUserId;
             record.GameId = vm.GameId;
             record.StateId = vm.StateId;
+            record.CreatedDateTime=Convert.ToDateTime(vm.CreatedDateTime);
+            record.ExpiryDateTime=Convert.ToDateTime(vm.ExpiryDateTime);
         }
 
         [HttpPost]

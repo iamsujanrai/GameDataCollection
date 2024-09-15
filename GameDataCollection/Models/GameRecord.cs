@@ -19,8 +19,8 @@ namespace GameDataCollection.Models
         public string? GameUserId { get; set; }
         public int StateId { get; set; }
         public long GameId { get; set; }
-        public DateTime CreatedDateTime { get; protected set; }
-        public DateTime ExpiryDateTime { get; protected set; }
+        public DateTime CreatedDateTime { get; set; }
+        public DateTime ExpiryDateTime { get; set; }
 
         [ForeignKey(nameof(StateId))]
         public virtual State? State { get; set; }

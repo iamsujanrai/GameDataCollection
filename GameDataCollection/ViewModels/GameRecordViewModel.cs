@@ -13,6 +13,8 @@ namespace GameDataCollection.ViewModels
         public string? GameUserId { get; set; }
         public int StateId { get; set; }
         public long GameId { get; set; }
+        public DateTime? CreatedDateTime { get; set; }
+        public DateTime? ExpiryDateTime { get; set; }
 
         public IEnumerable<SelectListItem>? States { get; set; }
         public IEnumerable<SelectListItem>? Games { get; set; }

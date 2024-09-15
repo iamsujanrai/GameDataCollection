@@ -16,7 +16,7 @@ namespace GameDataCollection.Repositories
         {
             var currentDate = DateTime.UtcNow;
             return await _context.GamesRecord
-                .Where(gr => gr.ExpiryDateTime.Date > currentDate.Date)
+                .Where(gr => gr.ExpiryDateTime.Date >= currentDate.Date.AddDays(1))
                 .OrderByDescending(x => x.CreatedDateTime)
                 .ToListAsync();
         }
