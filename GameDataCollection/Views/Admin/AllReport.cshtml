@@ -1,0 +1,104 @@
+﻿@model GameDataCollection.ViewModels.ReportViewModel
+@{
+    string isExpired = "Expired";
+}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Non Expired Records</h3>
+        <div class="card-tools" style="float: right;">
+            <!-- This will be where the DataTable search box is moved -->
+        </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="nonexpiredtbl" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>State</th>
+                    <th>Refferred By</th>
+                    <th>Email</th>
+                    <th>Facebook Name</th>
+                    <th>Game</th>
+                    <th>Game Id</th>
+                    <th>Entry Date</th>
+                    <th>Expiry Date</th>
+                    <th>Is Expired</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (GameRecord item in Model.GameRecords)
+                {
+
+                    @if (item.CreatedDateTime.AddMonths(1) <= DateTime.Now)
+                    {
+                        isExpired = "Expired";
+                    }
+                    else
+                    {
+                        isExpired = "Non Expired";
+                    }
+                    <tr>
+                        <td>@item.FullName</td>
+                        <td>@item.PhoneNumber</td>
+                        <td>@item.State.Name</td>
+                        <td>@item.RefferedBy</td>
+                        <td>@item.Email</td>
+                        <td>@item.FacebookName</td>
+                        <td>@item.Game.Name</td>
+                        <td>@item.GameUserId</td>
+                        <td>@item.CreatedDateTime</td>
+                        <td>@item.ExpiryDateTime</td>
+                        <td>@isExpired</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "GameRecord", new { id = item.Id })" class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
+                            <a href="@Url.Action("Delete", "GameRecord", new { id = item.Id })" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this record?');">
+                                Delete
+                            </a>
+                        </td> <!-- Action buttons for Edit and Delete -->
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>State</th>
+                    <th>Refferred By</th>
+                    <th>Email</th>
+                    <th>Facebook Name</th>
+                    <th>Game</th>
+                    <th>Game Id</th>
+                    <th>Entry Date</th>
+                    <th>Expiry Date</th>
+                    <th>Actions</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+<!-- /.card -->
+@section scripts {
+    <script>
+        $(function () {
+            $('#nonexpiredtbl').DataTable({
+                "paging": true,
+                "lengthChange": false,
+                "searching": true,
+                "ordering": false,
+                "info": true,
+                "autoWidth": false,
+                "responsive": false,
+                "dom": '<"top"f>rt<"bottom"ip><"clear">'
+            });
+            // Move the search box into the card tools div
+            $('#nonexpiredtbl_filter').appendTo('.card-tools');
+            $('#nonexpiredtbl_filter input').attr('placeholder', 'Search...');
+        });
+    </script>
+}

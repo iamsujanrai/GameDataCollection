@@ -18,6 +18,7 @@ namespace GameDataCollection.Extension
             //set the content 
             mail.Subject = subject;
             mail.Body = body;
+            mail.IsBodyHtml = true;
             //send the message 
             SmtpClient smtp = new SmtpClient("mail.aliyagaming.com", 8889);
 
