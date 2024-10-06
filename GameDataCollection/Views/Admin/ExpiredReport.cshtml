@@ -72,16 +72,15 @@
                 "paging": true,
                 "lengthChange": false,
                 "searching": false,  // Keep this true to enable global search
-                "ordering": false,
+                "ordering": true,
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
             });
 
-            // Custom search for Full Name
-            $('#search-name').on('keyup', function () {
-                table.column(0).search(this.value).draw();
-            });
+            // Move the search box into the card tools div
+            $('#nonexpiredtbl_filter').appendTo('.card-tools');
+            $('#nonexpiredtbl_filter input').attr('placeholder', 'Search...');
         });
     </script>
 }

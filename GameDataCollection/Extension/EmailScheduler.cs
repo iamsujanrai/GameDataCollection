@@ -34,7 +34,7 @@ namespace GameDataCollection.Extension
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // Schedule the task to run every X seconds or minutes
-            _timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            _timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
         }
