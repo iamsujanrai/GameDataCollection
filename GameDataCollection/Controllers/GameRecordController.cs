@@ -75,7 +75,7 @@ namespace GameDataCollection.Controllers
                     Games = GetGames(),
                     States = GetStates()
                 };
-                return RedirectToAction("Create");
+                return RedirectToAction("Congratulation");
             }
             catch (Exception)
             {
@@ -190,6 +190,11 @@ namespace GameDataCollection.Controllers
                 Value = g.Id.ToString(),
                 Text = g.Name
             })];
+        }
+        [HttpGet]
+        public IActionResult Congratulation()
+        {
+            return View();
         }
     }
 }
