@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace GameDataCollection.Controllers
 {
@@ -17,19 +18,21 @@ namespace GameDataCollection.Controllers
         private readonly IGameRecordService _gameRecordService;
         private readonly INotyfService _notyf;
         private readonly IEmailSetupService _emailSetupService;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf,IEmailSetupService emailSetupService)
+        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf,IEmailSetupService emailSetupService, IHttpClientFactory clientFactory)
         {
             _context = context;
             _gameRecordService = gameRecordService;
             _notyf = notyf;
             _emailSetupService = emailSetupService;
+            _clientFactory = clientFactory;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            return View(Create());
         }
 
         [HttpGet]
@@ -49,39 +52,66 @@ namespace GameDataCollection.Controllers
         {
             try
             {
+                // Check ModelState first
                 if (!ModelState.IsValid)
                 {
-                    _notyf.Error("Internal Error Occurred!!");
+                    _notyf.Error("Invalid form data submitted.");
+                    vm.Games = GetGames();
+                    vm.States = GetStates();
+                    return View(vm);
                 }
 
+                // CAPTCHA Verification
+                var recaptchaResponse = Request.Form["g-recaptcha-response"];
+                var secretKey = "6LeK_i0rAAAAAK69ipD4G4a2mE1dMsdnrMEzd3ne"; // Replace this with your actual key
+
+                var client = _clientFactory.CreateClient();
+                var response = await client.PostAsync($"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={recaptchaResponse}", null);
+                var jsonString = await response.Content.ReadAsStringAsync();
+
+                var captchaResult = JsonSerializer.Deserialize<GoogleCaptchaResponse>(jsonString);
+
+                if (captchaResult == null || !captchaResult.success)
+                {
+                    _notyf.Error("Captcha validation failed. Please try again.");
+                    vm.Games = GetGames();
+                    vm.States = GetStates();
+                    return View(vm);
+                }
+
+                // Check for duplicate record
                 var recordExists = _gameRecordService.IsRecordExists(vm);
                 if (recordExists != null)
                 {
-                    _notyf.Error("Record already exist!!");
+                    _notyf.Error("Record already exists!");
                     return RedirectToAction("Create");
                 }
+
+                // Save data
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
 
-                _notyf.Success("Thanks for register");
-                EmailSender.EmailSend(vm.Email, "Thank you for register",EmailSender.RegisterTemplate(vm.FullName));
-                var listOfEmail= _emailSetupService.GetAll().Result.Where(a=>a.IsActive).ToList();
-                foreach (var item in listOfEmail)
-                {
-                    EmailSender.EmailSend(item.MemberEmail, $"{vm.FullName} Register sucessfully", EmailSender.RegisterTemplate(vm.FullName));
-                }
-                var newVm = new GameRecordViewModel
-                {
-                    Games = GetGames(),
-                    States = GetStates()
-                };
+                // Send emails
+                _notyf.Success("Thanks for registering!");
+                EmailSender.EmailSend(vm.Email, "Thank you for registering", EmailSender.RegisterTemplate(vm.FullName));
+
+                var listOfEmail = _emailSetupService.GetAll().Result.Where(a => a.IsActive).ToList();
+                // You can uncomment this if you want to notify internal members
+                //foreach (var item in listOfEmail)
+                //{
+                //    EmailSender.EmailSend(item.MemberEmail, $"{vm.FullName} registered successfully", EmailSender.RegisterTemplate(vm.FullName));
+                //}
+
                 return RedirectToAction("Congratulation");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                // Log exception here if possible
+                _notyf.Error("An unexpected error occurred.");
+                return RedirectToAction("Create");
             }
         }
+
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -196,5 +226,12 @@ namespace GameDataCollection.Controllers
         {
             return View();
         }
+    }
+    public class GoogleCaptchaResponse
+    {
+        public bool success { get; set; }
+        public string challenge_ts { get; set; }
+        public string hostname { get; set; }
+        public List<string> errorCodes { get; set; }
     }
 }

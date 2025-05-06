@@ -33,7 +33,7 @@ namespace GameDataCollection.Controllers
         {
             var vm = new ReportViewModel
             {
-                GameRecords = _gameRecordService.GetNonExpiredGameRecordsAsync().Result.ToList()
+                GameRecords = _gameRecordService.GetTodayRecordsAsync().Result.ToList()
             };
             return View(vm);
         }

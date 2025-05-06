@@ -12,6 +12,7 @@ namespace GameDataCollection.Services
         Task<List<GameRecord>> GetAll();
         Task<IEnumerable<GameRecord>> GetNonExpiredGameRecordsAsync();
         Task<IEnumerable<GameRecord>> GetExpiredGameRecordsAsync();
+        Task<IEnumerable<GameRecord>> GetTodayRecordsAsync();
         GameRecord IsRecordExists(GameRecordViewModel record);
     }
 }

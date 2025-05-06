@@ -51,7 +51,7 @@ builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDis
 //builder.Services.AddScoped<IEmailSetupService, EmailSetupService>();
 //builder.Services.AddScoped<IGameRecordService, GameRecordService>();
 //builder.Services.AddHostedService<EmailScheduler>();
-
+builder.Services.AddHttpClient();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -71,6 +71,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=GameRecord}/{action=Index}/{id?}");
+    pattern: "{controller=GameRecord}/{action=Create}/{id?}");
 
 app.Run();

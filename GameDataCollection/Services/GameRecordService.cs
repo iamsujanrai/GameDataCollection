@@ -101,5 +101,10 @@ namespace GameDataCollection.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<GameRecord>> GetTodayRecordsAsync()
+        {
+            return await _gameRecordRepository.GetTodayGameRecordsAsync();
+        }
     }
 }

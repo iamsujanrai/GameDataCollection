@@ -6,5 +6,6 @@ namespace GameDataCollection.Repositories
     {
         Task<IEnumerable<GameRecord>> GetNonExpiredGameRecordsAsync();
         Task<IEnumerable<GameRecord>> GetExpiredGameRecordsAsync();
+        Task<IEnumerable<GameRecord>> GetTodayGameRecordsAsync();
     }
 }

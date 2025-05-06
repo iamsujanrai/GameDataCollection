@@ -29,5 +29,16 @@ namespace GameDataCollection.Repositories
                 .OrderByDescending(x => x.CreatedDateTime)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<GameRecord>> GetTodayGameRecordsAsync()
+        {
+            var currentDate = DateTime.UtcNow.Date.AddDays(-1);
+            var nextDate = currentDate.AddDays(1);
+
+            return await _context.GamesRecord
+                .Where(gr => gr.CreatedDateTime >= currentDate && gr.CreatedDateTime < nextDate)
+                .OrderByDescending(x => x.CreatedDateTime)
+                .ToListAsync();
+        }
     }
 }
