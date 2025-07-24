@@ -45,6 +45,27 @@ namespace GameDataCollection.Migrations
                     b.ToTable("Emails");
                 });
 
+            modelBuilder.Entity("GameDataCollection.Models.Facebook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Facebooks");
+                });
+
             modelBuilder.Entity("GameDataCollection.Models.Game", b =>
                 {
                     b.Property<long>("Id")

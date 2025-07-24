@@ -30,5 +30,6 @@ namespace GameDataCollection.DbContext
         public DbSet<State> States { get; set; }
         public DbSet<GameRecord> GamesRecord { get; set; }
         public DbSet<Email> Emails { get; set; }
+        public DbSet<Facebook> Facebooks { get; set; }
     }
 }
