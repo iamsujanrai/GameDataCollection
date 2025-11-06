@@ -16,6 +16,7 @@ namespace GameDataCollection.Extension
             _serviceProvider = serviceProvider;
         }
         private Timer _timer;
+        private Timer _timerSecond;
 
         // This is the method you want to run on a schedule
         public Task MyScheduledMethod()
@@ -25,20 +26,46 @@ namespace GameDataCollection.Extension
                 var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
                 var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
                 SendDailyEmail(emailSetupService, gameRecordService);
-                // Your logic here
                 return Task.CompletedTask;
             }
-
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // Schedule the task to run every X seconds or minutes
-            _timer = new Timer(ExecuteTask, null, TimeSpan.Zero, TimeSpan.FromDays(1));
-
+            ScheduleNextRun();
             return Task.CompletedTask;
         }
+        private void ScheduleNextRun()
+        {
 
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
+                var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
+                SendDailyEmail(emailSetupService, gameRecordService);
+            }
+
+            TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
+
+            DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nepalTimeZone);
+
+            DateTime nextRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 0, 0);
+
+            DateTime secondRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 30, 0);
+
+            if (nowNepal > nextRun)
+                nextRun = nextRun.AddDays(1);
+
+            if(nowNepal > secondRun)
+                secondRun= secondRun.AddDays(1);
+
+            TimeSpan initialDelay = nextRun - nowNepal;
+
+            TimeSpan initialSecondDelay = secondRun - nowNepal;
+
+            _timer = new Timer(ExecuteTask, null, initialDelay, Timeout.InfiniteTimeSpan);
+            _timerSecond = new Timer(ExecuteTask, null, initialSecondDelay, Timeout.InfiniteTimeSpan);
+        }
         private void ExecuteTask(object state)
         {
 
@@ -50,12 +77,14 @@ namespace GameDataCollection.Extension
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _timer?.Change(Timeout.Infinite, 0);
+            _timerSecond?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
         public void Dispose()
         {
             _timer?.Dispose();
+            _timerSecond?.Dispose();
         }
         private string GetEmailBody(IEnumerable<GameRecord> gameRecords)
         {
@@ -121,11 +150,15 @@ namespace GameDataCollection.Extension
 
         public void SendDailyEmail(IEmailSetupService _emailSetupService, IGameRecordService _gameRecordService)
         {
+            TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
+
+            DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nepalTimeZone);
+
             var listOfEmail = _emailSetupService.GetAll().Result.Where(a => a.IsActive).ToList();
             var expiredGameList = _gameRecordService.GetExpiredGameRecordsAsync().Result.ToList();
 
             var body = GetEmailBody(expiredGameList);
-            var subject = "All Expired User";
+            var subject = $"Monthly Bonus User list Date: {nowNepal.Year}:{nowNepal.Month}:{nowNepal.AddDays(-1).Day}";
             foreach (var item in listOfEmail)
             {
                 EmailSender.EmailSend(item.MemberEmail, subject, body);

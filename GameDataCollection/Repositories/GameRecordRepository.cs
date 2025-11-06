@@ -23,7 +23,7 @@ namespace GameDataCollection.Repositories
 
         public async Task<IEnumerable<GameRecord>> GetExpiredGameRecordsAsync()
         {
-            var currentDate = DateTime.UtcNow.Date;
+            var currentDate = DateTime.UtcNow.Date.AddDays(-1);
             return await _context.GamesRecord
                 .Where(gr => gr.ExpiryDateTime.Day == currentDate.Date.Day)
                 .OrderByDescending(x => x.CreatedDateTime)
