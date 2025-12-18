@@ -1,0 +1,138 @@
+﻿@{
+    ViewData["Title"] = "Gift Spinner";
+}
+
+<div id="wheelContainer">
+    <div id="wheel">
+        <div class="slice">$1</div>
+        <div class="slice">$2</div>
+        <div class="slice">$5</div>
+        <div class="slice">$10</div>
+        <div class="slice">$20</div>
+        <div class="slice">$50</div>
+    </div>
+    <div id="pointer">▲</div>
+</div>
+
+<button id="spinBtn" class="btn btn-primary">SPIN 🎁</button>
+
+<div id="resultText" style="margin-top:15px;font-size:18px;"></div>
+
+<form id="spinForm" method="post">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        const wheel = document.getElementById("wheel");
+        const spinBtn = document.getElementById("spinBtn");
+        const resultText = document.getElementById("resultText");
+
+        let spinning = false;
+
+        function getAntiForgeryToken() {
+            return document.querySelector('#spinForm input[name="__RequestVerificationToken"]').value;
+        }
+
+        spinBtn.addEventListener("click", function () {
+            if (spinning) return;
+            spinning = true;
+            resultText.textContent = "";
+
+            fetch('@Url.Action("Spin", "Spin")', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": getAntiForgeryToken()
+                },
+                body: JSON.stringify({ }) // if you need extra data later
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => null);
+                    throw new Error(errData?.message || "Error spinning");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Rotate wheel to server-decided angle
+                wheel.style.transition = "transform 4s cubic-bezier(.17,.67,.83,.67)";
+                wheel.style.transform = `rotate(${data.finalRotationDeg}deg)`;
+
+                setTimeout(() => {
+                    spinning = false;
+                    resultText.textContent = `You won: ${data.prizeLabel} (${data.prizeAmount}) 🎉`;
+                }, 4200);
+            })
+            .catch(err => {
+                spinning = false;
+                resultText.textContent = err.message;
+            });
+        });
+    </script>
+}
+
+<style>
+    #wheelContainer {
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        border: 8px solid #333;
+        position: relative;
+        margin: 30px auto;
+        overflow: hidden;
+    }
+
+    #wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .slice {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: #ffe066;
+        border: 1px solid #333;
+        text-align: center;
+        line-height: 160px;
+        font-size: 22px;
+        font-weight: 600;
+        transform-origin: 100% 100%;
+    }
+
+        .slice:nth-child(1) {
+            transform: rotate(0deg);
+        }
+
+        .slice:nth-child(2) {
+            transform: rotate(60deg);
+        }
+
+        .slice:nth-child(3) {
+            transform: rotate(120deg);
+        }
+
+        .slice:nth-child(4) {
+            transform: rotate(180deg);
+        }
+
+        .slice:nth-child(5) {
+            transform: rotate(240deg);
+        }
+
+        .slice:nth-child(6) {
+            transform: rotate(300deg);
+        }
+
+    #pointer {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        font-weight: bold;
+    }
+</style>

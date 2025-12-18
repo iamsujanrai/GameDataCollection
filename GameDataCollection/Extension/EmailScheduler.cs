@@ -37,34 +37,42 @@ namespace GameDataCollection.Extension
         }
         private void ScheduleNextRun()
         {
-
             using (var scope = _serviceProvider.CreateScope())
             {
                 var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
                 var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
                 SendDailyEmail(emailSetupService, gameRecordService);
             }
+            try
+            {
+                TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
 
-            TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
+                DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nepalTimeZone);
 
-            DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nepalTimeZone);
+                DateTime nextRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 0, 0);
 
-            DateTime nextRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 0, 0);
+                DateTime secondRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 30, 0);
 
-            DateTime secondRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 30, 0);
+                if (nowNepal > nextRun)
+                    nextRun = nextRun.AddDays(1);
 
-            if (nowNepal > nextRun)
-                nextRun = nextRun.AddDays(1);
+                if (nowNepal > secondRun)
+                    secondRun = secondRun.AddDays(1);
 
-            if(nowNepal > secondRun)
-                secondRun= secondRun.AddDays(1);
+                TimeSpan initialDelay = nextRun - nowNepal;
 
-            TimeSpan initialDelay = nextRun - nowNepal;
+                TimeSpan initialSecondDelay = secondRun - nowNepal;
 
-            TimeSpan initialSecondDelay = secondRun - nowNepal;
+                _timer = new Timer(ExecuteTask, null, initialDelay, Timeout.InfiniteTimeSpan);
+                _timerSecond = new Timer(ExecuteTask, null, initialSecondDelay, Timeout.InfiniteTimeSpan);
+            }
+            catch (Exception ex)
+            {
+                EmailSender.EmailSend("rojinbastola@gmail.com", "Error in Task", ex.Message);
+            }
+            
 
-            _timer = new Timer(ExecuteTask, null, initialDelay, Timeout.InfiniteTimeSpan);
-            _timerSecond = new Timer(ExecuteTask, null, initialSecondDelay, Timeout.InfiniteTimeSpan);
+           
         }
         private void ExecuteTask(object state)
         {
@@ -158,7 +166,7 @@ namespace GameDataCollection.Extension
             var expiredGameList = _gameRecordService.GetExpiredGameRecordsAsync().Result.ToList();
 
             var body = GetEmailBody(expiredGameList);
-            var subject = $"Monthly Bonus User list Date: {nowNepal.Year}:{nowNepal.Month}:{nowNepal.AddDays(-1).Day}";
+            var subject = $"Monthly Bonus User list Date: {nowNepal.Year}:{nowNepal.Month}:{nowNepal.Day}";
             foreach (var item in listOfEmail)
             {
                 EmailSender.EmailSend(item.MemberEmail, subject, body);
