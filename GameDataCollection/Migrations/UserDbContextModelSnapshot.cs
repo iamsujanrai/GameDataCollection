@@ -42,7 +42,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Emails");
+                    b.ToTable("Emails", (string)null);
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.Facebook", b =>
@@ -63,7 +63,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Facebooks");
+                    b.ToTable("Facebooks", (string)null);
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.Game", b =>
@@ -80,7 +80,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.GameRecord", b =>
@@ -130,7 +130,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("GamesRecord");
+                    b.ToTable("GamesRecord", (string)null);
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.State", b =>
@@ -147,7 +147,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("States");
+                    b.ToTable("States", (string)null);
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.User", b =>

@@ -1,5 +1,6 @@
 using AspNetCoreHero.ToastNotification;
 using GameDataCollection.DbContext;
+using GameDataCollection.DbContext.Sedding;
 using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using GameDataCollection.Repositories;
@@ -48,11 +49,17 @@ builder.Services.AddAuthentication(options =>
     a.LoginPath = "/admin/Login";
 });
 builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDismissable = true; config.Position = NotyfPosition.TopRight; });
+
 //builder.Services.AddScoped<IEmailSetupService, EmailSetupService>();
 //builder.Services.AddScoped<IGameRecordService, GameRecordService>();
 //builder.Services.AddHostedService<EmailScheduler>();
 builder.Services.AddHttpClient();
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await SeedData.SeedRolesAndAdmin(scope.ServiceProvider);
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
