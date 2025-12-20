@@ -13,7 +13,6 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace GameDataCollection.Controllers
 {
-    [Authorize]
     public class AdminController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -28,7 +27,7 @@ namespace GameDataCollection.Controllers
             _gameRecordService = gameRecordService;
             _notyf = notyf;
         }
-
+        [Authorize(Roles = "User")]
         public IActionResult Index()
         {
             var vm = new ReportViewModel
@@ -71,36 +70,56 @@ namespace GameDataCollection.Controllers
                 _notyf.Error("Internal Error Occurred!!");
                 return View(vm);
             }
+
             var user = await _userManager.FindByNameAsync(vm.Username);
-            if (user is null)
+            if (user == null)
             {
                 _notyf.Error("Invalid username or password!!");
                 return View(vm);
             }
-            
-            var result = await _signInManager.PasswordSignInAsync(vm.Username, vm.Password, true, false);
+
+            var result = await _signInManager.PasswordSignInAsync(
+                vm.Username,
+                vm.Password,
+                isPersistent: true,
+                lockoutOnFailure: true
+            );
+            if (result.IsLockedOut)
+            {
+                _notyf.Error("Account locked out.");
+                return View(vm);
+            }
+
+            if (result.IsNotAllowed)
+            {
+                _notyf.Error("Login not allowed (email not confirmed or disabled).");
+                return View(vm);
+            }
+
+            if (result.RequiresTwoFactor)
+            {
+                _notyf.Warning("Two-factor authentication required.");
+                return View(vm);
+            }
+
             if (!result.Succeeded)
             {
-                _notyf.Error("Invalid username or password!!");
+                _notyf.Error("Invalid username or password.");
                 return View(vm);
             }
- 
-            var claims = new List<Claim>() {
-                new(ClaimTypes.NameIdentifier, Convert.ToString(user.Id)),
-                    new(ClaimTypes.Name, user.UserName),
-                    new(ClaimTypes.Email, user.Email)
-            };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity); 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties()
-            {
-                IsPersistent = false
-            });
+            // 🔐 ROLE-BASED REDIRECT
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+                return RedirectToAction("Index", "Admin");
 
-            return RedirectToAction("Index", "Admin");
+            return RedirectToAction("Index", "UserDashboard");
         }
-
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AccessDenied()
+        {
+            return View();
+        }
         public IActionResult ChangePassword()
         {
             return View();

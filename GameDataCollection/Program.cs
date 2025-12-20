@@ -39,14 +39,9 @@ builder.Services.AddScoped<IEmailSetupService, EmailSetupService>();
 builder.Services.AddScoped<IGameRecordService, GameRecordService>();
 
 builder.Services.AddHostedService<EmailScheduler>();
-builder.Services.AddAuthentication(options =>
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie(a =>
-{
-    a.LoginPath = "/admin/Login";
+    options.LoginPath = "/admin/Login";
 });
 builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDismissable = true; config.Position = NotyfPosition.TopRight; });
 
@@ -75,7 +70,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=GameRecord}/{action=Create}/{id?}");

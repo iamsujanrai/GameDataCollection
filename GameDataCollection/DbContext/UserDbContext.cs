@@ -9,14 +9,14 @@ namespace GameDataCollection.DbContext
     {
         public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
         {
-            this.Database.EnsureCreated();
+            //this.Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<IdentityRole>()
-                .Property(u => u.NormalizedName)
-                .HasMaxLength(36);
+            //modelBuilder.Entity<IdentityRole>()
+            //    .Property(u => u.NormalizedName)
+            //    .HasMaxLength(36);
             base.OnModelCreating(modelBuilder);
 
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
@@ -25,11 +25,11 @@ namespace GameDataCollection.DbContext
             }
         }
 
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<State> States { get; set; }
         public DbSet<GameRecord> GamesRecord { get; set; }
-        public DbSet<Email> Emails { get; set; }
+        public DbSet<Email> Emailss { get; set; }
         public DbSet<Facebook> Facebooks { get; set; }
     }
 }

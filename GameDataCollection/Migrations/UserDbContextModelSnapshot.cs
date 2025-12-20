@@ -42,7 +42,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Emails", (string)null);
+                    b.ToTable("Emails");
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.Facebook", b =>
@@ -63,7 +63,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Facebooks", (string)null);
+                    b.ToTable("Facebooks");
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.Game", b =>
@@ -80,7 +80,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Games");
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.GameRecord", b =>
@@ -130,7 +130,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("GamesRecord", (string)null);
+                    b.ToTable("GamesRecord");
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.State", b =>
@@ -147,7 +147,7 @@ namespace GameDataCollection.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("States", (string)null);
+                    b.ToTable("States");
                 });
 
             modelBuilder.Entity("GameDataCollection.Models.User", b =>
@@ -168,6 +168,10 @@ namespace GameDataCollection.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

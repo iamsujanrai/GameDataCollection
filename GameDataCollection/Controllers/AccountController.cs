@@ -1,6 +1,7 @@
 ﻿using GameDataCollection.DbContext;
 using GameDataCollection.Models;
 using GameDataCollection.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using System;
 
 namespace GameDataCollection.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/Account")]
     [ApiController]
     public class AccountController : ControllerBase
