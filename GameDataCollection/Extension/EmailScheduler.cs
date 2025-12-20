@@ -158,7 +158,7 @@ namespace GameDataCollection.Extension
             var expiredGameList = _gameRecordService.GetExpiredGameRecordsAsync().Result.ToList();
 
             var body = GetEmailBody(expiredGameList);
-            var subject = $"Monthly Bonus User list Date: {nowNepal.Year}:{nowNepal.Month}:{nowNepal.AddDays(-1).Day}";
+            var subject = $"Monthly Bonus User list Date: {nowNepal.Year}:{nowNepal.Month}:{nowNepal.Day}";
             foreach (var item in listOfEmail)
             {
                 EmailSender.EmailSend(item.MemberEmail, subject, body);
