@@ -105,7 +105,6 @@
 
 </body>
 </html>
-
 <script>
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
@@ -115,7 +114,8 @@
     const spinBtn = document.getElementById("spinBtn");
 
     let items = [];
-    let currentRotation = 0;
+    let currentRotation = 0;   // 0..359 (where the wheel is currently pointing)
+    let totalRotation = 0;     // keeps growing to ensure smooth animation every time
     let isSpinning = false;
 
     function hslColor(i, n) {
@@ -192,7 +192,7 @@
 
         items = await res.json();
         if (!Array.isArray(items) || items.length < 2) {
-            statusEl.textContent = "Need at least 2 active items in DB.";
+            statusEl.textContent = "Need at least 2 items.";
             drawWheel();
             return;
         }
@@ -203,6 +203,8 @@
     }
 
     function setWheelRotation(deg) {
+        // ✅ always 5 seconds animation
+        canvas.style.transition = "transform 5s cubic-bezier(.17,.67,.12,1)";
         canvas.style.transform = `rotate(${deg}deg)`;
     }
 
@@ -226,49 +228,7 @@
             return;
         }
 
-        // // Match winner by rewardId
-        // const rewardId = data.rewardId;
-        // const idx = items.findIndex(x => (x.id ?? x.Id) === rewardId);
-
-        // if (idx === -1) {
-        //     statusEl.textContent = "Winner not found in current wheel list. Reload wheel.";
-        //     isSpinning = false;
-        //     spinBtn.disabled = false;
-        //     loadBtn.disabled = false;
-        //     return;
-        // }
-
-        // // Calculate target angle
-        // const n = items.length;
-        // const sliceDeg = 360 / n;
-
-        // // Pointer is at top (0deg). Our slice center:
-        // // Canvas slices start at 0deg (3 o'clock direction), so we adjust by -90 deg.
-        // // center of selected slice (0° = 3 o'clock)
-        // const sliceCenter = (idx * sliceDeg) + (sliceDeg / 2);
-
-        // // pointer is at top = 270°
-        // const pointerDeg = 270;
-
-        // // find how much more we must rotate so sliceCenter lands on pointer
-        // const desiredRotation =
-        //     ((pointerDeg - sliceCenter) % 360 + 360) % 360;
-
-        // // rotate RELATIVE to current rotation
-        // const spins = 5; // full spins
-        // const delta =
-        //     ((desiredRotation - currentRotation) % 360 + 360) % 360;
-
-        // // small randomness inside slice
-        // const randomOffset = (Math.random() - 0.5) * (sliceDeg * 0.3);
-
-        // const finalDeg =
-        //     currentRotation + spins * 360 + delta + randomOffset;
-
-        // currentRotation = ((finalDeg % 360) + 360) % 360;
-        // setWheelRotation(finalDeg);
-
-        // winner index
+        // winner index (by rewardId)
         const rewardId = data.rewardId;
         const idx = items.findIndex(x => (x.id ?? x.Id) === rewardId);
 
@@ -283,29 +243,31 @@
         const n = items.length;
         const sliceDeg = 360 / n;
 
-        // slice center angle in wheel coordinates (0° at 3 o'clock)
+        // slice center angle (0° = 3 o'clock)
         const sliceCenter = (idx * sliceDeg) + (sliceDeg / 2);
 
         // pointer at TOP = 270°
         const pointerDeg = 270;
 
-        // this is the rotation (0..359) that would put the slice center under the pointer
+        // desiredRotation (0..359) that puts sliceCenter under pointer
         const desiredRotation = ((pointerDeg - sliceCenter) % 360 + 360) % 360;
 
-        // add full spins, then land exactly on desiredRotation
-        const fullSpins = 6; // ✅ spins whole first (change 4/5/6 as you like)
-
-        // IMPORTANT: rotate from currentRotation to desiredRotation
+        // rotate forward from currentRotation to desiredRotation
         const delta = ((desiredRotation - currentRotation) % 360 + 360) % 360;
 
-        // final rotation in degrees
-        const finalDeg = currentRotation + (fullSpins * 360) + delta;
+        // ✅ full spins first (5 seconds)
+        const fullSpins = 6;
 
-        // update and rotate
+        // ✅ keep totalRotation increasing so every spin animates correctly
+        totalRotation = totalRotation + (fullSpins * 360) + delta;
+
+        // update currentRotation for next spins
         currentRotation = desiredRotation;
-        setWheelRotation(finalDeg);
 
-        // Wait for CSS transition end (4s)
+        // rotate wheel
+        setWheelRotation(totalRotation);
+
+        // Wait for CSS transition end (5s)
         setTimeout(() => {
             statusEl.textContent = "Done ✅";
             winnerEl.textContent = `🎉 You won: ${data.title} (Amount: ${data.amount})`;
@@ -313,7 +275,7 @@
             isSpinning = false;
             spinBtn.disabled = false;
             loadBtn.disabled = false;
-        }, 4100);
+        }, 5100);
     }
 
     loadBtn.addEventListener("click", loadItems);

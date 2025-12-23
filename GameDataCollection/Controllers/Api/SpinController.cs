@@ -11,14 +11,14 @@ namespace GameDataCollection.Controllers.Api
         // ✅ THIS is where items come from
         private static readonly List<SpinItem> Items = new()
     {
-        new SpinItem { Id = 1, Title = "$5 Bonus",  Weight = 25, Amount = 5 },
-        new SpinItem { Id = 2, Title = "$10 Bonus", Weight = 5, Amount = 10 },
-        new SpinItem { Id = 3, Title = "Try Again", Weight = 20, Amount = 0 },
-        new SpinItem { Id = 4, Title = "11 Bonus", Weight = 10, Amount = 11 },
-        new SpinItem { Id = 5, Title = "12 Bonus", Weight = 10, Amount = 12 },
-        new SpinItem { Id = 6, Title = "13 Bonus", Weight = 10, Amount = 13},
-        new SpinItem { Id = 7, Title = "14 Bonus", Weight = 10, Amount = 14 },
-        new SpinItem { Id = 8, Title = "15 Bonus", Weight = 10, Amount = 15 },
+        new SpinItem { Id = 1, Title = "$5 Bonus",  Weight = 50, Amount = 5 },
+        new SpinItem { Id = 2, Title = "$10 Bonus", Weight = 0, Amount = 10 },
+        new SpinItem { Id = 3, Title = "Try Again", Weight = 50, Amount = 0 },
+        new SpinItem { Id = 4, Title = "11 Bonus", Weight = 0, Amount = 11 },
+        new SpinItem { Id = 5, Title = "12 Bonus", Weight = 0, Amount = 12 },
+        new SpinItem { Id = 6, Title = "13 Bonus", Weight = 0, Amount = 13},
+        new SpinItem { Id = 7, Title = "14 Bonus", Weight = 0, Amount = 14 },
+        new SpinItem { Id = 8, Title = "15 Bonus", Weight = 0, Amount = 15 },
     };
 
         [HttpGet("list")]
