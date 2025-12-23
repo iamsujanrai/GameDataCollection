@@ -1,93 +1,11 @@
 ﻿@{
-    Layout = null;
+    ViewData["Title"] = "Spin";
+    Layout = "_Layout";
 }
 
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Spin Wheel</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            padding: 30px;
-        }
-
-        .wrap {
-            width: 420px;
-            text-align: center;
-        }
-
-        .stage {
-            position: relative;
-            width: 360px;
-            height: 360px;
-            margin: 14px auto;
-        }
-
-        canvas {
-            width: 360px;
-            height: 360px;
-            border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0,0,0,.15);
-            transform: rotate(0deg);
-            transition: transform 4s cubic-bezier(.17,.67,.12,1);
-            background: #fff;
-            transform-origin: 50% 50%;
-        }
-
-        .pointer {
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-bottom: 22px solid #111;
-            z-index: 2;
-        }
-
-        .btns {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        button {
-            padding: 10px 16px;
-            cursor: pointer;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            background: #111;
-            color: #fff;
-        }
-
-            button:disabled {
-                opacity: .5;
-                cursor: not-allowed;
-            }
-
-        .meta {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .winner {
-            margin-top: 10px;
-            font-weight: 700;
-        }
-    </style>
-</head>
-<body>
-    <div class="wrap">
-        <h2>🎡 Spin Wheel</h2>
+<div class="spin-page">
+    <div class="spin-card">
+        <h2 class="spin-title">🎡 Spin Wheel</h2>
 
         <div class="stage">
             <div class="pointer"></div>
@@ -95,16 +13,99 @@
         </div>
 
         <div class="btns">
-            <button id="loadBtn">Load</button>
-            <button id="spinBtn" disabled>Spin</button>
+            <button id="loadBtn" type="button">Load</button>
+            <button id="spinBtn" type="button" disabled>Spin</button>
         </div>
 
-        <div class="meta" id="status">Click Load to fetch items…</div>
-        <div class="winner" id="winner"></div>
+        <div id="status" class="status">Click Load to fetch items…</div>
+        <div id="winner" class="winner"></div>
     </div>
+</div>
 
-</body>
-</html>
+<style>
+    /* ✅ centers inside layout body */
+    .spin-page {
+        min-height: calc(100vh - 120px); /* adjust if your header is bigger/smaller */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .spin-card {
+        width: 420px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+
+    .spin-title {
+        margin: 0 0 10px;
+    }
+
+    .stage {
+        position: relative;
+        width: 360px;
+        height: 360px;
+        margin: 14px auto;
+    }
+
+    canvas {
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        box-shadow: 0 10px 30px rgba(0,0,0,.15);
+        transform-origin: 50% 50%;
+        background: #fff;
+    }
+
+    .pointer {
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-bottom: 22px solid #111;
+        z-index: 2;
+    }
+
+    .btns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    button {
+        padding: 10px 16px;
+        cursor: pointer;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        background: #111;
+        color: #fff;
+    }
+
+        button:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+    .status {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .winner {
+        margin-top: 10px;
+        font-weight: 700;
+    }
+</style>
 <script>
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
