@@ -73,5 +73,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=GameRecord}/{action=Create}/{id?}");
+app.MapControllers();
 
 app.Run();
