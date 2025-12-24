@@ -37,12 +37,12 @@ namespace GameDataCollection.Extension
         }
         private void ScheduleNextRun()
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
-                var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
-                SendDailyEmail(emailSetupService, gameRecordService);
-            }
+            //using (var scope = _serviceProvider.CreateScope())
+            //{
+            //    var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
+            //    var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
+            //    SendDailyEmail(emailSetupService, gameRecordService);
+            //}
             try
             {
                 TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
