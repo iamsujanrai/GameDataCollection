@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameDataCollection.Controllers
 {
-    [Authorize(Roles = "User,Admin")]
+    [Authorize(Roles = "User")]
     public class UserDashboardController : Controller
     {
         public IActionResult Index()

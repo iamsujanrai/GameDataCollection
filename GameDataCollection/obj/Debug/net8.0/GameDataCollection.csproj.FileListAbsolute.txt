@@ -516,3 +516,10 @@ C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.pdb
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.genruntimeconfig.cache
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\ref\GameDataCollection.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.Mvc.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.Razor.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.Helpers.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.WebPages.Deployment.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.WebPages.Razor.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.WebPages.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\Microsoft.Web.Infrastructure.dll
