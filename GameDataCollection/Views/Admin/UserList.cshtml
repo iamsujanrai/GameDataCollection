@@ -1,0 +1,89 @@
+@model GameDataCollection.ViewModels.UserListViewModel
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-success">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">User List</h3>
+                <a asp-action="Register" class="btn btn-sm btn-light">
+                    <i class="fas fa-user-plus mr-1"></i> Register User
+                </a>
+            </div>
+
+            <!-- Search -->
+            <div class="card-body pb-0">
+                <form asp-action="UserList" method="get" class="form-inline mb-3">
+                    <div class="input-group">
+                        <input name="search" value="@Model.Search" type="text"
+                               class="form-control" placeholder="Search by name or email..." />
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            @if (!string.IsNullOrWhiteSpace(Model.Search))
+                            {
+                                <a asp-action="UserList" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>@user.FullName</td>
+                                <td>@user.Email</td>
+                                <td>@user.PhoneNumber</td>
+                                <td>
+                                    <a asp-action="GrantSpins" asp-route-userId="@user.Id"
+                                       class="btn btn-xs btn-info">
+                                        <i class="fas fa-gift"></i> Grant Spins
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Users.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">No users found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card-footer clearfix">
+                <ul class="pagination pagination-sm m-0 float-right">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="UserList"
+                               asp-route-page="@i"
+                               asp-route-search="@Model.Search">
+                                @i
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>

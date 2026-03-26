@@ -1,0 +1,48 @@
+@model GameDataCollection.ViewModels.SpinSettingViewModel
+@{
+    ViewData["Title"] = "Spin Settings";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-cog mr-2"></i>Spin Cooldown Settings</h3>
+            </div>
+            <form asp-action="SpinSettings" method="post">
+                @Html.AntiForgeryToken()
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Users can spin <strong>@Model.MaxSpinsPerPeriod</strong> time(s) every
+                        <strong>@Model.CooldownHours</strong> hour(s). After the limit is reached,
+                        they must wait for the cooldown window to reset.
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CooldownHours"></label>
+                        <input asp-for="CooldownHours" class="form-control" type="number" min="1" max="720" />
+                        <span asp-validation-for="CooldownHours" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            e.g. 24 = daily limit, 12 = twice a day, 1 = once per hour
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="MaxSpinsPerPeriod"></label>
+                        <input asp-for="MaxSpinsPerPeriod" class="form-control" type="number" min="1" max="100" />
+                        <span asp-validation-for="MaxSpinsPerPeriod" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            How many spins are allowed within the cooldown window
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

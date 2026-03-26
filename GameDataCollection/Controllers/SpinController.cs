@@ -1,10 +1,11 @@
-﻿using GameDataCollection.Services;
+using GameDataCollection.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace GameDataCollection.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User")]
     [AutoValidateAntiforgeryToken]
     public class SpinController : Controller
     {
@@ -15,16 +16,18 @@ namespace GameDataCollection.Controllers
             _spinService = spinService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var prizes = await _spinService.GetActiveSpinPrizesAsync();
+            return View(prizes);
         }
 
         [HttpPost]
         public async Task<IActionResult> Spin()
         {
-            // Replace this with however you get user id (Identity, custom, etc.)
-            string userId = User.Identity?.Name ?? "anonymous";
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
 
             var result = await _spinService.SpinAsync(userId);
 

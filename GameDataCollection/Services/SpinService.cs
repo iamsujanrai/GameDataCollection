@@ -1,96 +1,122 @@
-﻿using System.Security.Cryptography;
-using System;
+using System.Security.Cryptography;
+using GameDataCollection.DbContext;
 using GameDataCollection.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameDataCollection.Services
 {
     public class SpinService : ISpinService
     {
-        // You can move this to DB or config later
-        private readonly List<PrizeOption> _prizes = new()
-        {
-            new PrizeOption { Index = 0, Label = "$1",  Amount = 1,  Weight = 40 },
-            new PrizeOption { Index = 1, Label = "$2",  Amount = 2,  Weight = 30 },
-            new PrizeOption { Index = 2, Label = "$5",  Amount = 5,  Weight = 15 },
-            new PrizeOption { Index = 3, Label = "$10", Amount = 10, Weight = 10 },
-            new PrizeOption { Index = 4, Label = "$20", Amount = 20, Weight = 4 },
-            new PrizeOption { Index = 5, Label = "$50", Amount = 50, Weight = 1 },
-        };
-
-        //private readonly ApplicationDbContext _db;
+        private readonly UserDbContext _db;
         private readonly ILogger<SpinService> _logger;
 
-        public SpinService(/*ApplicationDbContext db, */ILogger<SpinService> logger)
+        public SpinService(UserDbContext db, ILogger<SpinService> logger)
         {
-            //_db = db;
+            _db = db;
             _logger = logger;
         }
 
         public async Task<SpinResult> SpinAsync(string userId)
         {
-            // 🔒 Example: limit spins per day
-            var today = DateTime.UtcNow.Date;
-            int maxDailySpins = 5;
+            // Load settings (fallback if not seeded yet)
+            var setting = await _db.SpinSettings.FirstOrDefaultAsync()
+                ?? new SpinSetting { CooldownHours = 24, MaxSpinsPerPeriod = 5 };
 
-            //int usedSpins = await _db.Spins
-            //    .Where(s => s.UserId == userId && s.CreatedAt >= today)
-            //    .CountAsync();
+            // Load active prizes ordered by SortOrder
+            var prizes = await _db.SpinPrizes
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.SortOrder)
+                .ToListAsync();
 
-            //if (usedSpins >= maxDailySpins)
-            //{
-            //    return new SpinResult
-            //    {
-            //        Success = false,
-            //        Message = "Daily spin limit reached."
-            //    };
-            //}
+            if (!prizes.Any())
+                return new SpinResult { Success = false, Message = "No prizes configured." };
 
-            // 🎲 Choose prize using weighted randomness
-            var prize = GetRandomPrize();
+            // Check cooldown window
+            var windowStart = DateTime.UtcNow.AddHours(-setting.CooldownHours);
+            int usedSpins = await _db.SpinHistories
+                .Where(s => s.UserId == userId && s.SpunAt >= windowStart)
+                .CountAsync();
 
-            // 🧮 Calculate wheel rotation so pointer ends on this prize
-            int totalSlices = _prizes.Count;
-            double sliceAngle = 360.0 / totalSlices;
-            double fullSpins = RandomNumberGenerator.GetInt32(5, 10); // 5–9 full turns
-            double offsetToCenter = sliceAngle / 2.0;
-            double finalRotation = fullSpins * 360.0 + prize.Index * sliceAngle + offsetToCenter;
+            bool usedGrant = false;
+            if (usedSpins >= setting.MaxSpinsPerPeriod)
+            {
+                // Check for admin-granted bonus spins
+                var grant = await _db.UserSpinGrants
+                    .Where(g => g.UserId == userId && g.SpinsUsed < g.SpinsGranted)
+                    .OrderBy(g => g.GrantedAt)
+                    .FirstOrDefaultAsync();
 
-            //// 💾 Save spin to DB (simplified)
-            //_db.Spins.Add(new Spin
-            //{
-            //    UserId = userId,
-            //    PrizeAmount = prize.Amount,
-            //    PrizeLabel = prize.Label,
-            //    SegmentIndex = prize.Index,
-            //    CreatedAt = DateTime.UtcNow
-            //});
-            //await _db.SaveChangesAsync();
+                if (grant == null)
+                {
+                    int hoursLeft = (int)Math.Ceiling(
+                        (windowStart.AddHours(setting.CooldownHours) - DateTime.UtcNow).TotalHours);
+                    return new SpinResult
+                    {
+                        Success = false,
+                        Message = $"Spin limit reached. Next spin available in ~{hoursLeft}h."
+                    };
+                }
+
+                grant.SpinsUsed++;
+                usedGrant = true;
+            }
+
+            // Choose prize using weighted randomness
+            var prize = GetRandomPrize(prizes);
+            int prizeIndex = prizes.IndexOf(prize);
+
+            // Save spin to DB
+            _db.SpinHistories.Add(new SpinHistory
+            {
+                UserId = userId,
+                PrizeAmount = prize.Amount,
+                PrizeLabel = prize.Label,
+                SegmentIndex = prizeIndex,
+                SpunAt = DateTime.UtcNow
+            });
+            await _db.SaveChangesAsync();
 
             return new SpinResult
             {
                 Success = true,
-                Message = "Spin completed.",
+                Message = usedGrant ? "Spin completed using a bonus spin." : "Spin completed.",
                 PrizeLabel = prize.Label,
                 PrizeAmount = prize.Amount,
-                PrizeIndex = prize.Index,
-                FinalRotationDeg = finalRotation
+                PrizeIndex = prizeIndex,
+                FinalRotationDeg = 0 // client calculates rotation from PrizeIndex
             };
         }
 
-        private PrizeOption GetRandomPrize()
+        public async Task<List<SpinHistory>> GetSpinHistoryAsync(string userId)
         {
-            int totalWeight = _prizes.Sum(p => p.Weight);
+            return await _db.SpinHistories
+                .Where(s => s.UserId == userId)
+                .OrderByDescending(s => s.SpunAt)
+                .Take(20)
+                .ToListAsync();
+        }
+
+        public async Task<List<SpinPrize>> GetActiveSpinPrizesAsync()
+        {
+            return await _db.SpinPrizes
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.SortOrder)
+                .ToListAsync();
+        }
+
+        private static SpinPrize GetRandomPrize(List<SpinPrize> prizes)
+        {
+            int totalWeight = prizes.Sum(p => p.Weight);
             int randomNumber = RandomNumberGenerator.GetInt32(0, totalWeight);
 
             int cumulative = 0;
-            foreach (var p in _prizes)
+            foreach (var p in prizes)
             {
                 cumulative += p.Weight;
                 if (randomNumber < cumulative)
                     return p;
             }
-
-            return _prizes.Last();
+            return prizes.Last();
         }
     }
 }

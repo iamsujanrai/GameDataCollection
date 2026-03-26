@@ -1,10 +1,15 @@
-﻿@{
+@{
     ViewData["Title"] = "Spin";
     Layout = "_UserLayout";
 }
 
+@Html.AntiForgeryToken()
+
 <div class="spin-page">
     <div class="spin-card">
+        <a href="@Url.Action("Index", "UserDashboard")" class="btn btn-secondary btn-sm mb-3">
+            &larr; Back to Dashboard
+        </a>
         <h2 class="spin-title">🎡 Spin Wheel</h2>
 
         <div class="stage">
@@ -13,19 +18,17 @@
         </div>
 
         <div class="btns">
-            <button id="loadBtn" type="button">Load</button>
-            <button id="spinBtn" type="button" disabled>Spin</button>
+            <button id="spinBtn" type="button">Spin</button>
         </div>
 
-        <div id="status" class="status">Click Load to fetch items…</div>
+        <div id="status" class="status">Click Spin to try your luck!</div>
         <div id="winner" class="winner"></div>
     </div>
 </div>
 
 <style>
-    /* ✅ centers inside layout body */
     .spin-page {
-        min-height: calc(100vh - 120px); /* adjust if your header is bigger/smaller */
+        min-height: calc(100vh - 120px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -81,16 +84,17 @@
         margin-top: 10px;
     }
 
-    button {
-        padding: 10px 16px;
+    #spinBtn {
+        padding: 10px 24px;
         cursor: pointer;
         border-radius: 10px;
         border: 1px solid #ddd;
         background: #111;
         color: #fff;
+        font-size: 16px;
     }
 
-        button:disabled {
+        #spinBtn:disabled {
             opacity: .5;
             cursor: not-allowed;
         }
@@ -104,6 +108,12 @@
     .winner {
         margin-top: 10px;
         font-weight: 700;
+        font-size: 18px;
+        color: #28a745;
+    }
+
+    .winner.error {
+        color: #dc3545;
     }
 </style>
 <script>
@@ -111,12 +121,19 @@
     const ctx = canvas.getContext("2d");
     const statusEl = document.getElementById("status");
     const winnerEl = document.getElementById("winner");
-    const loadBtn = document.getElementById("loadBtn");
     const spinBtn = document.getElementById("spinBtn");
 
-    let items = [];
-    let currentRotation = 0;   // 0..359 (where the wheel is currently pointing)
-    let totalRotation = 0;     // keeps growing to ensure smooth animation every time
+    // Static prize list matching SpinService prizes
+    const items = [
+        { title: "$1" },
+        { title: "$2" },
+        { title: "$5" },
+        { title: "$10" },
+        { title: "$20" },
+        { title: "$50" }
+    ];
+
+    let totalRotation = 0;
     let isSpinning = false;
 
     function hslColor(i, n) {
@@ -131,14 +148,6 @@
 
         ctx.clearRect(0, 0, w, h);
 
-        if (!items.length) {
-            ctx.fillStyle = "#222";
-            ctx.font = "16px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("No items loaded", cx, cy);
-            return;
-        }
-
         const n = items.length;
         const arc = (Math.PI * 2) / n;
 
@@ -146,7 +155,6 @@
             const start = i * arc;
             const end = start + arc;
 
-            // Slice
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, radius, start, end);
@@ -154,15 +162,13 @@
             ctx.fillStyle = hslColor(i, n);
             ctx.fill();
 
-            // Text
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(start + arc / 2);
             ctx.textAlign = "right";
             ctx.fillStyle = "#111";
-            ctx.font = "bold 14px Arial";
-            const label = items[i].title ?? items[i].Title ?? "";
-            ctx.fillText(label.length > 18 ? label.slice(0, 18) + "…" : label, radius - 12, 5);
+            ctx.font = "bold 16px Arial";
+            ctx.fillText(items[i].title, radius - 12, 5);
             ctx.restore();
         }
 
@@ -180,108 +186,71 @@
         ctx.fillText("SPIN", cx, cy + 5);
     }
 
-    async function loadItems() {
-        winnerEl.textContent = "";
-        statusEl.textContent = "Loading items…";
-        spinBtn.disabled = true;
-
-        const res = await fetch("/api/spin/list");
-        if (!res.ok) {
-            statusEl.textContent = "Failed to load.";
-            return;
-        }
-
-        items = await res.json();
-        if (!Array.isArray(items) || items.length < 2) {
-            statusEl.textContent = "Need at least 2 items.";
-            drawWheel();
-            return;
-        }
-
-        drawWheel();
-        statusEl.textContent = `Loaded ${items.length} items ✅`;
-        spinBtn.disabled = false;
-    }
-
     function setWheelRotation(deg) {
-        // ✅ always 5 seconds animation
         canvas.style.transition = "transform 5s cubic-bezier(.17,.67,.12,1)";
         canvas.style.transform = `rotate(${deg}deg)`;
     }
 
     async function spin() {
-        if (!items.length || isSpinning) return;
+        if (isSpinning) return;
 
         isSpinning = true;
         spinBtn.disabled = true;
-        loadBtn.disabled = true;
         winnerEl.textContent = "";
+        winnerEl.className = "winner";
         statusEl.textContent = "Spinning…";
 
-        const res = await fetch("/api/spin/generate", { method: "POST" });
-        const data = await res.json();
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-        if (!res.ok || data?.message) {
-            statusEl.textContent = data?.message || "Spin failed.";
+        let data;
+        try {
+            const res = await fetch("/Spin/Spin", {
+                method: "POST",
+                headers: { "RequestVerificationToken": token }
+            });
+
+            data = await res.json();
+
+            if (!res.ok) {
+                winnerEl.textContent = data.message || "Spin failed.";
+                winnerEl.className = "winner error";
+                statusEl.textContent = "";
+                isSpinning = false;
+                spinBtn.disabled = false;
+                return;
+            }
+        } catch (e) {
+            winnerEl.textContent = "Network error. Please try again.";
+            winnerEl.className = "winner error";
+            statusEl.textContent = "";
             isSpinning = false;
             spinBtn.disabled = false;
-            loadBtn.disabled = false;
             return;
         }
 
-        // winner index (by rewardId)
-        const rewardId = data.rewardId;
-        const idx = items.findIndex(x => (x.id ?? x.Id) === rewardId);
-
-        if (idx === -1) {
-            statusEl.textContent = "Winner not found. Reload wheel.";
-            isSpinning = false;
-            spinBtn.disabled = false;
-            loadBtn.disabled = false;
-            return;
-        }
-
-        const n = items.length;
-        const sliceDeg = 360 / n;
-
-        // slice center angle (0° = 3 o'clock)
-        const sliceCenter = (idx * sliceDeg) + (sliceDeg / 2);
-
-        // pointer at TOP = 270°
-        const pointerDeg = 270;
-
-        // desiredRotation (0..359) that puts sliceCenter under pointer
-        const desiredRotation = ((pointerDeg - sliceCenter) % 360 + 360) % 360;
-
-        // rotate forward from currentRotation to desiredRotation
-        const delta = ((desiredRotation - currentRotation) % 360 + 360) % 360;
-
-        // ✅ full spins first (5 seconds)
-        const fullSpins = 6;
-
-        // ✅ keep totalRotation increasing so every spin animates correctly
-        totalRotation = totalRotation + (fullSpins * 360) + delta;
-
-        // update currentRotation for next spins
-        currentRotation = desiredRotation;
-
-        // rotate wheel
+        // Compute exact rotation so pointer lands on the winning segment
+        const sliceAngle = 360 / items.length;
+        // Canvas draws slices from 0° (3-o'clock), pointer is fixed at 270° (12-o'clock).
+        // After CSS clockwise rotation X, pointer aligns with canvas angle (270 - X) % 360.
+        // To land on center of prizeIndex: X = (270 - (prizeIndex*sliceAngle + sliceAngle/2) + 360) % 360
+        const targetAngle = (270 - (data.prizeIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
+        const currentAngle = totalRotation % 360;
+        let delta = targetAngle - currentAngle;
+        if (delta <= 0) delta += 360;
+        totalRotation += 5 * 360 + delta;
         setWheelRotation(totalRotation);
 
-        // Wait for CSS transition end (5s)
         setTimeout(() => {
-            statusEl.textContent = "Done ✅";
-            winnerEl.textContent = `🎉 You won: ${data.title} (Amount: ${data.amount})`;
-
+            statusEl.textContent = "Done! 🎉";
+            winnerEl.textContent = `You won: ${data.prizeLabel}!`;
+            winnerEl.className = "winner";
             isSpinning = false;
             spinBtn.disabled = false;
-            loadBtn.disabled = false;
         }, 5100);
     }
 
-    loadBtn.addEventListener("click", loadItems);
     spinBtn.addEventListener("click", spin);
 
-    // Initial draw
+    // Draw wheel on load
     drawWheel();
 </script>

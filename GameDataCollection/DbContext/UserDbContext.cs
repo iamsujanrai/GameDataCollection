@@ -31,5 +31,9 @@ namespace GameDataCollection.DbContext
         public DbSet<GameRecord> GamesRecord { get; set; }
         public DbSet<Email> Emailss { get; set; }
         public DbSet<Facebook> Facebooks { get; set; }
+        public DbSet<SpinHistory> SpinHistories { get; set; }
+        public DbSet<SpinSetting> SpinSettings { get; set; }
+        public DbSet<SpinPrize> SpinPrizes { get; set; }
+        public DbSet<UserSpinGrant> UserSpinGrants { get; set; }
     }
 }

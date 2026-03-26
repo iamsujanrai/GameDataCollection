@@ -38,8 +38,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ2hhbmdlUGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/CreateSpinPrize.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlU3BpblByaXplLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/EditSpinPrize.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFNwaW5Qcml6ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/ExpiredReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRXhwaXJlZFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/GrantSpins.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cR3JhbnRTcGlucy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/Index.cshtml]
@@ -48,6 +60,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmVnaXN0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/SpinPrizes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3BpblByaXplcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/SpinSettings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3BpblNldHRpbmdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/Admin/UserList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlckxpc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Dell/source/repos/GameDataCollection/GameDataCollection/Views/EmailSetup/Create.cshtml]

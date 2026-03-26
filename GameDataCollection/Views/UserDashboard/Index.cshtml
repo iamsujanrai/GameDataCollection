@@ -1,4 +1,130 @@
-﻿@{
-    ViewData["Title"] = "Create";
+@model GameDataCollection.ViewModels.UserDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard";
     Layout = "_UserLayout";
 }
+
+<div class="row">
+    <!-- Profile Card -->
+    <div class="col-md-6">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-user mr-2"></i>My Profile</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Full Name</dt>
+                    <dd class="col-sm-8">@Model.FullName</dd>
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+                    <dt class="col-sm-4">Spins Left Today</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge badge-@(Model.SpinsRemainingToday > 0 ? "success" : "danger") p-2">
+                            @Model.SpinsRemainingToday / 5 remaining
+                        </span>
+                    </dd>
+                </dl>
+                @if (Model.SpinsRemainingToday > 0)
+                {
+                    <a href="@Url.Action("Index", "Spin")" class="btn btn-warning btn-block">
+                        <i class="fas fa-sync-alt mr-1"></i> Go Spin the Wheel!
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary btn-block" disabled>
+                        <i class="fas fa-clock mr-1"></i> Daily limit reached — come back tomorrow!
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Record Card -->
+    <div class="col-md-6">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-gamepad mr-2"></i>My Game Record</h3>
+            </div>
+            <div class="card-body">
+                @if (Model.GameRecord != null)
+                {
+                    <dl class="row">
+                        <dt class="col-sm-5">Game</dt>
+                        <dd class="col-sm-7">@Model.GameRecord.Game?.Name</dd>
+                        <dt class="col-sm-5">Game User ID</dt>
+                        <dd class="col-sm-7">@Model.GameRecord.GameUserId</dd>
+                        <dt class="col-sm-5">State</dt>
+                        <dd class="col-sm-7">@Model.GameRecord.State?.Name</dd>
+                        <dt class="col-sm-5">Phone</dt>
+                        <dd class="col-sm-7">@Model.GameRecord.PhoneNumber</dd>
+                        <dt class="col-sm-5">Registered</dt>
+                        <dd class="col-sm-7">@Model.GameRecord.CreatedDateTime.ToString("MMM dd, yyyy")</dd>
+                        <dt class="col-sm-5">Expires</dt>
+                        <dd class="col-sm-7">
+                            @{
+                                var isExpired = Model.GameRecord.ExpiryDateTime < DateTime.Now;
+                            }
+                            <span class="badge badge-@(isExpired ? "danger" : "success") p-1">
+                                @Model.GameRecord.ExpiryDateTime.ToString("MMM dd, yyyy")
+                                @(isExpired ? "(Expired)" : "(Active)")
+                            </span>
+                        </dd>
+                    </dl>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        No game record found linked to your email address.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spin History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-trophy mr-2"></i>My Spin History (Last 20)</h3>
+            </div>
+            <div class="card-body table-responsive p-0">
+                @if (Model.SpinHistory.Any())
+                {
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Prize Won</th>
+                                <th>Amount</th>
+                                <th>Date &amp; Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int rowNum = 1; }
+                            @foreach (var spin in Model.SpinHistory)
+                            {
+                                <tr>
+                                    <td>@rowNum++</td>
+                                    <td><span class="badge badge-warning p-1">@spin.PrizeLabel</span></td>
+                                    <td>$@spin.PrizeAmount.ToString("0.00")</td>
+                                    <td>@spin.SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-spinner fa-2x mb-2"></i>
+                        <p>No spins yet. <a href="@Url.Action("Index", "Spin")">Spin the wheel</a> to win prizes!</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

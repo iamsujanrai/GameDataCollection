@@ -54,6 +54,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     await SeedData.SeedRolesAndAdmin(scope.ServiceProvider);
+    await SeedData.SeedSpinDefaults(scope.ServiceProvider);
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

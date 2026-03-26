@@ -38,7 +38,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="/Admin/Index" class="nav-link">Home</a>
+                    <a href="/UserDashboard/Index" class="nav-link">Home</a>
                 </li>
             </ul>
 
@@ -58,7 +58,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="/Admin/Index" class="brand-link">
+            <a href="/UserDashboard/Index" class="brand-link">
                 <img src="/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
                      style="opacity: .8">
                 <span class="brand-text font-weight-light">User Panel</span>
@@ -72,7 +72,7 @@
                         <img src="/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">User</a>
+                        <a href="#" class="d-block">@User.Identity?.Name</a>
                     </div>
                 </div>
 
@@ -82,20 +82,25 @@
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="/Admin/index" class="nav-link">
-                                <i class="nav-icon far fa-image"></i>
-                                <p>
-                                    Today Records
-                                </p>
+                            <a href="/UserDashboard/Index" class="nav-link">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/Admin/AllReport" class="nav-link">
-                                <i class="nav-icon far fa-image"></i>
-                                <p>
-                                    All Report
-                                </p>
+                            <a href="/Spin/Index" class="nav-link">
+                                <i class="nav-icon fas fa-sync-alt"></i>
+                                <p>Spin Wheel</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="/Account/Logout" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link btn btn-link" style="background:none;border:none;padding:0;width:100%;text-align:left;">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p>Logout</p>
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </nav>

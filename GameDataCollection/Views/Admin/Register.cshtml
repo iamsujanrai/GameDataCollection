@@ -1,0 +1,67 @@
+﻿@model GameDataCollection.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-6">
+        <!-- general form elements -->
+        <div class="card card-success">
+
+            <div class="card-header">
+                <h3 class="card-title">Register User</h3>
+            </div>
+
+            <!-- form start -->
+            <form asp-action="Register" method="post">
+                <div class="card-body">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label asp-for="FullName"></label>
+                        <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label asp-for="Email"></label>
+                        <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label asp-for="Password"></label>
+                        <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-success">
+                        Register
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

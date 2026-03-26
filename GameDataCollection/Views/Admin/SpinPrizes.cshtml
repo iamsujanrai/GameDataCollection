@@ -1,0 +1,76 @@
+@model List<GameDataCollection.Models.SpinPrize>
+@{
+    ViewData["Title"] = "Spin Prizes";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-success">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title"><i class="fas fa-trophy mr-2"></i>Spin Prizes</h3>
+                <a asp-action="CreateSpinPrize" class="btn btn-sm btn-light">
+                    <i class="fas fa-plus mr-1"></i> Add Prize
+                </a>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Label</th>
+                            <th>Amount</th>
+                            <th>Weight</th>
+                            <th>Probability</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int totalWeight = Model.Where(p => p.IsActive).Sum(p => p.Weight);
+                        }
+                        @foreach (var prize in Model)
+                        {
+                            double pct = totalWeight > 0 && prize.IsActive
+                                ? Math.Round(prize.Weight * 100.0 / totalWeight, 1)
+                                : 0;
+                            <tr>
+                                <td>@prize.SortOrder</td>
+                                <td><strong>@prize.Label</strong></td>
+                                <td>$@prize.Amount.ToString("0.00")</td>
+                                <td>@prize.Weight</td>
+                                <td>
+                                    <span class="badge badge-info p-1">@pct%</span>
+                                </td>
+                                <td>
+                                    @if (prize.IsActive)
+                                    {
+                                        <span class="badge badge-success p-1">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-secondary p-1">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="EditSpinPrize" asp-route-id="@prize.Id"
+                                       class="btn btn-xs btn-warning">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form asp-action="DeleteSpinPrize" asp-route-id="@prize.Id"
+                                          method="post" style="display:inline;"
+                                          onsubmit="return confirm('Delete this prize?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-xs btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

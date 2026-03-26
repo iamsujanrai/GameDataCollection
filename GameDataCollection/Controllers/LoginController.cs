@@ -112,6 +112,15 @@ namespace GameDataCollection.Controllers
 
             return RedirectToAction("Index", "UserDashboard");
         }
+        [HttpPost]
+        [Route("Logout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login");
+        }
+
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AccessDenied()
