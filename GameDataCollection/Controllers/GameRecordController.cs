@@ -4,6 +4,7 @@ using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,8 @@ using System.Text.Json;
 
 namespace GameDataCollection.Controllers
 {
+    [Authorize(Roles = "Admin")]
+
     public class GameRecordController : Controller
     {
         private readonly UserDbContext _context;

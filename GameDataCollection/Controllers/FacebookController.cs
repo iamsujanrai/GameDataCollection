@@ -1,10 +1,12 @@
 ﻿using GameDataCollection.DbContext;
 using GameDataCollection.Models;
 using GameDataCollection.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameDataCollection.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class FacebookController : Controller
     {
         private readonly UserDbContext _context;

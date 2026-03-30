@@ -10,7 +10,8 @@ using System.Net;
 
 namespace GameDataCollection.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+
     public class GameController : Controller
     {
         private readonly IGameService _gameService;

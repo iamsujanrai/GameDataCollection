@@ -2,10 +2,12 @@
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameDataCollection.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class EmailSetupController : Controller
     {
         private readonly IEmailSetupService _emailService;

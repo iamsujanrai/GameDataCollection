@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GameDataCollection.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -31,7 +32,6 @@ namespace GameDataCollection.Controllers
             _notyf = notyf;
             _db = db;
         }
-        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var vm = new ReportViewModel
