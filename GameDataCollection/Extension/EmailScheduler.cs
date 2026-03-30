@@ -1,98 +1,68 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using System.Net;
-using System.Net.Mail;
 using GameDataCollection.Models;
 using System.Text;
 using GameDataCollection.Services;
-using static System.Formats.Asn1.AsnWriter;
+
 namespace GameDataCollection.Extension
 {
     public class EmailScheduler : IHostedService, IDisposable
     {
+        private static readonly TimeZoneInfo NepalTz =
+            TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
+
         private readonly IServiceScopeFactory _serviceProvider;
+        private Timer _timer;
+        private DateTime? _lastSentDate; // Nepal date of last successful send
+
         public EmailScheduler(IServiceScopeFactory serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
-        private Timer _timer;
-        private Timer _timerSecond;
-
-        // This is the method you want to run on a schedule
-        public Task MyScheduledMethod()
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
-                var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
-                SendDailyEmail(emailSetupService, gameRecordService);
-                return Task.CompletedTask;
-            }
-        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            ScheduleNextRun();
+            // Poll every 60 seconds
+            _timer = new Timer(CheckAndSend, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             return Task.CompletedTask;
         }
-        private void ScheduleNextRun()
+
+        private void CheckAndSend(object state)
         {
-            //using (var scope = _serviceProvider.CreateScope())
-            //{
-            //    var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
-            //    var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
-            //    SendDailyEmail(emailSetupService, gameRecordService);
-            //}
             try
             {
-                TimeZoneInfo nepalTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
+                DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, NepalTz);
+                DateTime todayNepal = nowNepal.Date;
 
-                DateTime nowNepal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nepalTimeZone);
+                // Only fire at or after 14:00, and only once per calendar day
+                if (nowNepal.Hour < 14)
+                    return;
 
-                DateTime nextRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 0, 0);
+                if (_lastSentDate.HasValue && _lastSentDate.Value == todayNepal)
+                    return;
 
-                DateTime secondRun = new DateTime(nowNepal.Year, nowNepal.Month, nowNepal.Day, 9, 30, 0);
+                using var scope = _serviceProvider.CreateScope();
+                var emailSetupService = scope.ServiceProvider.GetRequiredService<IEmailSetupService>();
+                var gameRecordService = scope.ServiceProvider.GetRequiredService<IGameRecordService>();
+                SendDailyEmail(emailSetupService, gameRecordService);
 
-                if (nowNepal > nextRun)
-                    nextRun = nextRun.AddDays(1);
-
-                if (nowNepal > secondRun)
-                    secondRun = secondRun.AddDays(1);
-
-                TimeSpan initialDelay = nextRun - nowNepal;
-
-                TimeSpan initialSecondDelay = secondRun - nowNepal;
-
-                _timer = new Timer(ExecuteTask, null, initialDelay, Timeout.InfiniteTimeSpan);
-                _timerSecond = new Timer(ExecuteTask, null, initialSecondDelay, Timeout.InfiniteTimeSpan);
+                _lastSentDate = todayNepal;
             }
             catch (Exception ex)
             {
-                EmailSender.EmailSend("rojinbastola@gmail.com", "Error in Task", ex.Message);
+                EmailSender.EmailSend("rojinbastola@gmail.com", "Error in EmailScheduler", ex.Message);
             }
-            
-
-           
-        }
-        private void ExecuteTask(object state)
-        {
-
-            MyScheduledMethod();
-            // Call your specific method
-
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _timer?.Change(Timeout.Infinite, 0);
-            _timerSecond?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }
 
         public void Dispose()
         {
             _timer?.Dispose();
-            _timerSecond?.Dispose();
         }
         private string GetEmailBody(IEnumerable<GameRecord> gameRecords)
         {

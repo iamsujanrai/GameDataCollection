@@ -91,19 +91,53 @@
                         </li>
                         <li class="nav-item">
                             <a href="/Admin/UserList" class="nav-link">
-                                <i class="nav-icon far fa-image"></i>
-                                <p>
-                                    UserList
-                                </p>
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>User List</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="/Admin/Register" class="nav-link">
-                                <i class="nav-icon far fa-image"></i>
-                                <p>
-                                    Register User
-                                </p>
+                                <i class="nav-icon fas fa-user-plus"></i>
+                                <p>Register User</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Admin/GrantSpins" class="nav-link">
+                                <i class="nav-icon fas fa-gift"></i>
+                                <p>Grant Spins</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Admin/SpinGrants" class="nav-link">
+                                <i class="nav-icon fas fa-list-alt"></i>
+                                <p>Spin Grants</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Admin/SpinRecords" class="nav-link">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>Spin Records</p>
+                            </a>
+                        </li>
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-sync-alt"></i>
+                                <p>Spin Setup <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/Admin/SpinSettings" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cooldown Settings</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/SpinPrizes" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Prizes</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="/Admin/AllReport" class="nav-link">
@@ -152,6 +186,15 @@
                                     Add Email
                                 </p>
                             </a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" asp-controller="Login" asp-action="Logout" style="margin:0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link btn btn-link text-danger" style="background:none;border:none;width:100%;text-align:left;padding:.5rem 1rem">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                                    <p style="display:inline;margin:0">Logout</p>
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </nav>

@@ -141,6 +141,9 @@ namespace GameDataCollection.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsGrantedSpin")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("PrizeAmount")
                         .HasColumnType("decimal(18,2)");
 

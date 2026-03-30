@@ -1,0 +1,53 @@
+@model List<GameDataCollection.Models.UserSpinGrant>
+@{
+    ViewData["Title"] = "Spin Grants";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title"><i class="fas fa-gift mr-2"></i>Spin Grants</h3>
+        <a asp-action="GrantSpins" class="btn btn-sm btn-info">
+            <i class="fas fa-plus mr-1"></i> Grant Spins
+        </a>
+    </div>
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Granted</th>
+                    <th>Used</th>
+                    <th>Remaining</th>
+                    <th>Note</th>
+                    <th>Granted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var grant in Model)
+                {
+                    int remaining = grant.SpinsGranted - grant.SpinsUsed;
+                    <tr>
+                        <td>@(grant.User?.FullName ?? "—")</td>
+                        <td>@(grant.User?.Email ?? grant.UserId)</td>
+                        <td><span class="badge badge-primary p-1">@grant.SpinsGranted</span></td>
+                        <td><span class="badge badge-secondary p-1">@grant.SpinsUsed</span></td>
+                        <td>
+                            <span class="badge badge-@(remaining > 0 ? "success" : "danger") p-1">
+                                @remaining
+                            </span>
+                        </td>
+                        <td>@(grant.Note ?? "—")</td>
+                        <td>@grant.GrantedAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">No grants yet.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -10,7 +10,7 @@ namespace GameDataCollection.Models
             ExpiryDateTime = CreatedDateTime.AddMonths(1);
         }
 
-        public long Id { get; set; }
+        public int Id { get; set; }
         public required string FullName { get; set; }
         public required string PhoneNumber { get; set; }
         public string? RefferedBy { get; set; }

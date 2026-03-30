@@ -16,7 +16,6 @@ namespace GameDataCollection.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ISpinService _spinService;
         private readonly UserDbContext _db;
-        private const int MaxDailySpins = 5;
 
         public UserDashboardController(UserManager<User> userManager, ISpinService spinService, UserDbContext db)
         {
@@ -37,8 +36,11 @@ namespace GameDataCollection.Controllers
                 .FirstOrDefaultAsync(g => g.Email.ToLower() == user.Email.ToLower());
 
             var spinHistory = await _spinService.GetSpinHistoryAsync(userId);
-
-            int spinsToday = spinHistory.Count(s => s.SpunAt.Date == DateTime.UtcNow.Date);
+            var (freeSpins, grantedSpins) = await _spinService.GetSpinsRemainingAsync(userId);
+            int total = freeSpins + grantedSpins;
+            DateTime? nextSpinAt = total == 0
+                ? await _spinService.GetNextSpinAvailableAtAsync(userId)
+                : null;
 
             var vm = new UserDashboardViewModel
             {
@@ -46,7 +48,10 @@ namespace GameDataCollection.Controllers
                 Email = user.Email,
                 GameRecord = gameRecord,
                 SpinHistory = spinHistory,
-                SpinsRemainingToday = Math.Max(0, MaxDailySpins - spinsToday)
+                SpinsRemainingToday = total,
+                FreeSpinsRemaining = freeSpins,
+                GrantedSpinsRemaining = grantedSpins,
+                NextSpinAvailableAt = nextSpinAt
             };
 
             return View(vm);

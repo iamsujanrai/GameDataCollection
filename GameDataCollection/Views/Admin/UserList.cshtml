@@ -39,16 +39,23 @@
                             <th>Full Name</th>
                             <th>Email</th>
                             <th>Phone</th>
+                            <th>Spins Left</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var user in Model.Users)
                         {
+                            int spinsLeft = Model.SpinsRemainingByUserId.TryGetValue(user.Id, out var s) ? s : 0;
                             <tr>
                                 <td>@user.FullName</td>
                                 <td>@user.Email</td>
                                 <td>@user.PhoneNumber</td>
+                                <td>
+                                    <span class="badge badge-@(spinsLeft > 0 ? "success" : "danger") p-1">
+                                        @spinsLeft
+                                    </span>
+                                </td>
                                 <td>
                                     <a asp-action="GrantSpins" asp-route-userId="@user.Id"
                                        class="btn btn-xs btn-info">

@@ -17,11 +17,17 @@
                     <dd class="col-sm-8">@Model.FullName</dd>
                     <dt class="col-sm-4">Email</dt>
                     <dd class="col-sm-8">@Model.Email</dd>
-                    <dt class="col-sm-4">Spins Left Today</dt>
+                    <dt class="col-sm-4">Spins Left</dt>
                     <dd class="col-sm-8">
                         <span class="badge badge-@(Model.SpinsRemainingToday > 0 ? "success" : "danger") p-2">
-                            @Model.SpinsRemainingToday / 5 remaining
+                            @Model.SpinsRemainingToday spin@(Model.SpinsRemainingToday == 1 ? "" : "s") remaining
                         </span>
+                        @if (Model.GrantedSpinsRemaining > 0)
+                        {
+                            <small class="text-muted ml-1">
+                                (@Model.FreeSpinsRemaining free + @Model.GrantedSpinsRemaining granted)
+                            </small>
+                        }
                     </dd>
                 </dl>
                 @if (Model.SpinsRemainingToday > 0)
@@ -33,7 +39,15 @@
                 else
                 {
                     <button class="btn btn-secondary btn-block" disabled>
-                        <i class="fas fa-clock mr-1"></i> Daily limit reached — come back tomorrow!
+                        <i class="fas fa-clock mr-1"></i>
+                        @if (Model.NextSpinAvailableAt.HasValue)
+                        {
+                            @:Next spin available at @Model.NextSpinAvailableAt.Value.ToLocalTime().ToString("MMM dd, hh:mm tt")
+                        }
+                        else
+                        {
+                            @:No spins remaining
+                        }
                     </button>
                 }
             </div>

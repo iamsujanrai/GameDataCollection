@@ -1,3 +1,4 @@
+@model List<GameDataCollection.Models.SpinPrize>
 @{
     ViewData["Title"] = "Spin";
     Layout = "_UserLayout";
@@ -117,21 +118,15 @@
     }
 </style>
 <script>
+    // Prize list from server (dynamic)
+    const items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        Model.Select(p => new { title = p.Label })));
+
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
     const statusEl = document.getElementById("status");
     const winnerEl = document.getElementById("winner");
     const spinBtn = document.getElementById("spinBtn");
-
-    // Static prize list matching SpinService prizes
-    const items = [
-        { title: "$1" },
-        { title: "$2" },
-        { title: "$5" },
-        { title: "$10" },
-        { title: "$20" },
-        { title: "$50" }
-    ];
 
     let totalRotation = 0;
     let isSpinning = false;

@@ -110,15 +110,70 @@ namespace GameDataCollection.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            // Batch-compute spins remaining for each user on this page
+            var setting = await _db.SpinSettings.FirstOrDefaultAsync()
+                ?? new SpinSetting { CooldownHours = 24, MaxSpinsPerPeriod = 1 };
+
+            var userIds = users.Select(u => u.Id).ToList();
+
+            // Only count free spins (not granted) for cooldown calculation
+            var lastSpins = await _db.SpinHistories
+                .Where(s => userIds.Contains(s.UserId) && !s.IsGrantedSpin)
+                .GroupBy(s => s.UserId)
+                .Select(g => new { UserId = g.Key, LastSpun = g.Max(s => s.SpunAt) })
+                .ToListAsync();
+            var lastSpinDict = lastSpins.ToDictionary(x => x.UserId, x => x.LastSpun);
+
+            // Load all grants for this page's users into memory, sum in C#
+            var allGrantRows = await _db.UserSpinGrants
+                .Where(g => userIds.Contains(g.UserId))
+                .ToListAsync();
+            var grantsDict = allGrantRows
+                .GroupBy(g => g.UserId)
+                .ToDictionary(
+                    grp => grp.Key,
+                    grp => grp.Sum(g => Math.Max(0, g.SpinsGranted - g.SpinsUsed))
+                );
+
+            var now = DateTime.UtcNow;
+            var spinsRemaining = users.ToDictionary(u => u.Id, u =>
+            {
+                bool lastSpinFound = lastSpinDict.TryGetValue(u.Id, out var lastSpun);
+                bool regularAvailable = !lastSpinFound || lastSpun.AddHours(setting.CooldownHours) <= now;
+                int granted = grantsDict.TryGetValue(u.Id, out var g) ? g : 0;
+                return (regularAvailable ? 1 : 0) + granted;
+            });
+
             var model = new UserListViewModel
             {
                 Users = users,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
-                Search = search
+                Search = search,
+                SpinsRemainingByUserId = spinsRemaining
             };
 
             return View(model);
+        }
+
+        // ── Spin Grants List ───────────────────────────────────────────
+        public async Task<IActionResult> SpinGrants()
+        {
+            var grants = await _db.UserSpinGrants
+                .Include(g => g.User)
+                .OrderByDescending(g => g.GrantedAt)
+                .ToListAsync();
+            return View(grants);
+        }
+
+        // ── Spin Records ───────────────────────────────────────────────
+        public async Task<IActionResult> SpinRecords()
+        {
+            var records = await _db.SpinHistories
+                .Include(s => s.User)
+                .OrderByDescending(s => s.SpunAt)
+                .ToListAsync();
+            return View(records);
         }
 
         // ── Spin Settings ──────────────────────────────────────────────
@@ -241,10 +296,11 @@ namespace GameDataCollection.Controllers
 
         // ── Grant Spins ────────────────────────────────────────────────
         [HttpGet]
-        public async Task<IActionResult> GrantSpins()
+        public async Task<IActionResult> GrantSpins(string? userId = null)
         {
             var vm = new GrantSpinsViewModel
             {
+                UserId = userId,
                 Users = await _userManager.Users.OrderBy(u => u.FullName).ToListAsync()
             };
             return View(vm);

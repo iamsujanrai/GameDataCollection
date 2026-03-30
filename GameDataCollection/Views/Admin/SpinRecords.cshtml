@@ -1,0 +1,68 @@
+@model List<GameDataCollection.Models.SpinHistory>
+@{
+    ViewData["Title"] = "Spin Records";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i>User Spin Records</h3>
+        <div class="card-tools"></div>
+    </div>
+    <div class="card-body">
+        <table id="spinRecordsTbl" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Prize</th>
+                    <th>Amount</th>
+                    <th>Date &amp; Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model)
+                {
+                    <tr>
+                        <td>@record.Id</td>
+                        <td>@(record.User?.FullName ?? "—")</td>
+                        <td>@(record.User?.Email ?? "—")</td>
+                        <td><span class="badge badge-warning p-1">@record.PrizeLabel</span></td>
+                        <td>$@record.PrizeAmount.ToString("0.00")</td>
+                        <td>@record.SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Prize</th>
+                    <th>Amount</th>
+                    <th>Date &amp; Time</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            $('#spinRecordsTbl').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "order": [[5, "desc"]],
+                "info": true,
+                "autoWidth": false,
+                "responsive": false,
+                "dom": '<"top"f>rt<"bottom"lp><"clear">'
+            });
+            $('#spinRecordsTbl_filter').appendTo('.card-tools');
+            $('#spinRecordsTbl_filter input').attr('placeholder', 'Search...');
+        });
+    </script>
+}

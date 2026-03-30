@@ -8,5 +8,6 @@ namespace GameDataCollection.ViewModels
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
         public string? Search { get; set; }
+        public Dictionary<string, int> SpinsRemainingByUserId { get; set; } = new();
     }
 }

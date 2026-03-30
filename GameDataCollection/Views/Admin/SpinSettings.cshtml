@@ -11,12 +11,14 @@
             </div>
             <form asp-action="SpinSettings" method="post">
                 @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="MaxSpinsPerPeriod" type="hidden" />
                 <div class="card-body">
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle mr-1"></i>
-                        Users can spin <strong>@Model.MaxSpinsPerPeriod</strong> time(s) every
-                        <strong>@Model.CooldownHours</strong> hour(s). After the limit is reached,
-                        they must wait for the cooldown window to reset.
+                        Each user gets <strong>1 spin</strong> automatically after the cooldown period.
+                        The spin does not stack — if unused, no extra spin is added on the next reset.
+                        Admin-granted spins are added separately and always stack.
                     </div>
 
                     <div class="form-group">
@@ -24,16 +26,7 @@
                         <input asp-for="CooldownHours" class="form-control" type="number" min="1" max="720" />
                         <span asp-validation-for="CooldownHours" class="text-danger"></span>
                         <small class="form-text text-muted">
-                            e.g. 24 = daily limit, 12 = twice a day, 1 = once per hour
-                        </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label asp-for="MaxSpinsPerPeriod"></label>
-                        <input asp-for="MaxSpinsPerPeriod" class="form-control" type="number" min="1" max="100" />
-                        <span asp-validation-for="MaxSpinsPerPeriod" class="text-danger"></span>
-                        <small class="form-text text-muted">
-                            How many spins are allowed within the cooldown window
+                            e.g. 24 = 1 spin per day &nbsp;|&nbsp; 12 = 1 spin every 12 hours &nbsp;|&nbsp; 1 = 1 spin per hour
                         </small>
                     </div>
                 </div>

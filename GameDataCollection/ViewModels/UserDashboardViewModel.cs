@@ -7,6 +7,9 @@ namespace GameDataCollection.ViewModels
         public string FullName { get; set; }
         public string Email { get; set; }
         public int SpinsRemainingToday { get; set; }
+        public int FreeSpinsRemaining { get; set; }
+        public int GrantedSpinsRemaining { get; set; }
+        public DateTime? NextSpinAvailableAt { get; set; }
         public GameRecord? GameRecord { get; set; }
         public List<SpinHistory> SpinHistory { get; set; } = new();
     }
