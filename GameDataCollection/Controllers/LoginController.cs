@@ -122,8 +122,7 @@ namespace GameDataCollection.Controllers
         }
 
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AccessDenied()
+        public IActionResult AccessDenied()
         {
             return View();
         }

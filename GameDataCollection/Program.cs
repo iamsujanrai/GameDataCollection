@@ -18,12 +18,6 @@ builder.Services.AddDbContext<UserDbContext>(options =>
               options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("GameDataCollection").CommandTimeout(4000)), ServiceLifetime.Transient);
 builder.Services.Configure<SchedulerOptions>(
     builder.Configuration.GetSection("Scheduler"));
-// Scoped services that might depend on DbContext
-builder.Services.AddScoped<IEmailSetupService, EmailSetupService>();
-builder.Services.AddScoped<IGameRecordService, GameRecordService>();
-
-// Register hosted service for the scheduler
-builder.Services.AddHostedService<EmailScheduler>();
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedEmail = true;
@@ -41,7 +35,8 @@ builder.Services.AddScoped<IGameRecordService, GameRecordService>();
 builder.Services.AddHostedService<EmailScheduler>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/admin/Login";
+    options.LoginPath = "/Login/Login";
+    options.AccessDeniedPath = "/Login/AccessDenied";
 });
 builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDismissable = true; config.Position = NotyfPosition.TopRight; });
 
@@ -54,7 +49,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     await SeedData.SeedRolesAndAdmin(scope.ServiceProvider);
-    await SeedData.SeedSpinDefaults(scope.ServiceProvider);
+    try { await SeedData.SeedSpinDefaults(scope.ServiceProvider); } catch { /* spin tables not yet migrated */ }
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
