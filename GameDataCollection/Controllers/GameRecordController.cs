@@ -33,12 +33,15 @@ namespace GameDataCollection.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View(Create());
         }
 
         [HttpGet]
+        [AllowAnonymous]
+
         public IActionResult Create()
         {
             var vm = new GameRecordViewModel
@@ -50,6 +53,7 @@ namespace GameDataCollection.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GameRecordViewModel vm)
         {
