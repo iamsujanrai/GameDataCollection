@@ -13,8 +13,6 @@ using System.Text.Json;
 
 namespace GameDataCollection.Controllers
 {
-    [Authorize(Roles = "Admin")]
-
     public class GameRecordController : Controller
     {
         private readonly UserDbContext _context;
@@ -120,6 +118,7 @@ namespace GameDataCollection.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var record = _gameRecordService.getById(id);
@@ -162,6 +161,7 @@ namespace GameDataCollection.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(GameRecordViewModel vm)
         {
@@ -183,6 +183,7 @@ namespace GameDataCollection.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var vm = new GameRecordViewModel
@@ -229,6 +230,7 @@ namespace GameDataCollection.Controllers
             })];
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Congratulation()
         {
             return View();
