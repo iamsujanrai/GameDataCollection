@@ -1,4 +1,5 @@
 using AspNetCoreHero.ToastNotification;
+using GameDataCollection.Hubs;
 using GameDataCollection.DbContext;
 using GameDataCollection.DbContext.Sedding;
 using GameDataCollection.Extension;
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IEmailSetupService, EmailSetupService>();
 builder.Services.AddScoped<IGameRecordService, GameRecordService>();
 
 builder.Services.AddHostedService<EmailScheduler>();
+builder.Services.AddSignalR();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Login/Login";
@@ -70,5 +72,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=GameRecord}/{action=Create}/{id?}");
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

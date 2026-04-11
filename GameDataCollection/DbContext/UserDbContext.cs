@@ -35,5 +35,6 @@ namespace GameDataCollection.DbContext
         public DbSet<SpinSetting> SpinSettings { get; set; }
         public DbSet<SpinPrize> SpinPrizes { get; set; }
         public DbSet<UserSpinGrant> UserSpinGrants { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }

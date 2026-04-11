@@ -1,0 +1,251 @@
+@model List<GameDataCollection.Models.ChatMessage>
+@{
+    ViewData["Title"] = "Chat";
+    string adminId = ViewBag.AdminId;
+    string? selectedUserId = ViewBag.SelectedUserId;
+    var chattedUsers = (List<GameDataCollection.Models.User>)ViewBag.ChattedUsers;
+    var unreadByUser = (Dictionary<string, int>)ViewBag.UnreadByUser;
+    var allUsers = (List<GameDataCollection.Models.User>)ViewBag.AllUsers;
+}
+
+<div class="row">
+    <!-- User List -->
+    <div class="col-md-3">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Conversations</h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="nav flex-column">
+                    @foreach (var u in chattedUsers)
+                    {
+                        bool isActive = u.Id == selectedUserId;
+                        int unread = unreadByUser.TryGetValue(u.Id, out var cnt) ? cnt : 0;
+                        <li class="nav-item">
+                            <a href="@Url.Action("AdminChat", "Chat", new { userId = u.Id })"
+                               class="nav-link @(isActive ? "active bg-success text-white" : "")">
+                                <i class="fas fa-user mr-1"></i>
+                                @(u.FullName ?? u.Email)
+                                @if (unread > 0)
+                                {
+                                    <span class="badge badge-danger float-right">@unread</span>
+                                }
+                            </a>
+                        </li>
+                    }
+                    @if (!chattedUsers.Any())
+                    {
+                        <li class="nav-item px-3 py-2 text-muted small">No conversations yet.</li>
+                    }
+                </ul>
+            </div>
+            <!-- Start new conversation -->
+            <div class="card-footer p-2">
+                <form method="get" asp-action="AdminChat">
+                    <select name="userId" class="form-control form-control-sm mb-1"
+                            onchange="this.form.submit()">
+                        <option value="">— Start new chat —</option>
+                        @foreach (var u in allUsers)
+                        {
+                            if (u.Id == selectedUserId)
+                            {
+                                <option value="@u.Id" selected>@(u.FullName ?? u.Email)</option>
+                            }
+                            else
+                            {
+                                <option value="@u.Id">@(u.FullName ?? u.Email)</option>
+                            }
+                        }
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="col-md-9">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-comments mr-1"></i>
+                    @if (selectedUserId != null)
+                    {
+                        var selUser = allUsers.FirstOrDefault(u => u.Id == selectedUserId);
+                        @(selUser?.FullName ?? selUser?.Email ?? "Chat")
+                    }
+                    else
+                    {
+                        @:Select a user to start chatting
+                    }
+                </h3>
+            </div>
+
+            <div class="card-body" id="chat-box" style="height:420px;overflow-y:auto;padding:15px;">
+                @if (selectedUserId == null)
+                {
+                    <p class="text-muted text-center mt-5">Select a user from the left panel.</p>
+                }
+                else
+                {
+                    foreach (var msg in Model)
+                    {
+                        bool isMine = msg.SenderId == adminId;
+                        <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
+                            <div class="@(isMine ? "bg-primary text-white" : "bg-light text-dark") rounded p-2"
+                                 style="max-width:70%;word-break:break-word;">
+                                @if (!string.IsNullOrEmpty(msg.ImagePath))
+                                {
+                                    <a href="@msg.ImagePath" target="_blank">
+                                        <img src="@msg.ImagePath" style="max-width:220px;max-height:220px;border-radius:6px;" />
+                                    </a>
+                                }
+                                @if (!string.IsNullOrEmpty(msg.Message))
+                                {
+                                    <div>@msg.Message</div>
+                                }
+                                <small class="d-block @(isMine ? "text-white-50" : "text-muted")" style="font-size:11px;">
+                                    @msg.SentAt.ToLocalTime().ToString("MMM dd, hh:mm tt")
+                                </small>
+                            </div>
+                        </div>
+                    }
+                }
+                <div id="chat-end"></div>
+            </div>
+
+            @if (selectedUserId != null)
+            {
+                <div class="card-footer">
+                    <div id="image-preview-area" class="mb-2" style="display:none;">
+                        <img id="image-preview" style="max-height:80px;border-radius:6px;" />
+                        <button type="button" class="btn btn-xs btn-danger ml-1" id="cancel-image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="msg-input" class="form-control"
+                               placeholder="Type a message..." autocomplete="off" />
+                        <div class="input-group-append">
+                            <label class="btn btn-default mb-0" title="Send image">
+                                <i class="fas fa-image"></i>
+                                <input type="file" id="img-file" accept="image/*" style="display:none;" />
+                            </label>
+                            <button class="btn btn-primary" id="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+@if (selectedUserId != null)
+{
+<script>
+(function () {
+    const myUserId     = "@adminId";
+    const targetUserId = "@selectedUserId";
+    let pendingImagePath = null;
+
+    function setupChat(conn) {
+        conn.on("ReceiveMessage", function (msg) {
+            if (msg.senderId === targetUserId || msg.senderId === myUserId) {
+                appendMessage(msg);
+                scrollToBottom();
+            }
+            if (msg.senderId !== myUserId) {
+                conn.invoke("MarkRead", msg.senderId).catch(() => {});
+                updateChatBadge(0);
+            }
+        });
+        conn.invoke("MarkRead", targetUserId).catch(() => {});
+    }
+
+    if (window.chatHubConn) {
+        if (window.chatHubConn.state === signalR.HubConnectionState.Connected) {
+            setupChat(window.chatHubConn);
+        } else {
+            const poll = setInterval(() => {
+                if (window.chatHubConn.state === signalR.HubConnectionState.Connected) {
+                    clearInterval(poll);
+                    setupChat(window.chatHubConn);
+                }
+            }, 100);
+        }
+    }
+
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
+    document.getElementById("msg-input").addEventListener("keydown", e => {
+        if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+        const conn = window.chatHubConn;
+        if (!conn) return;
+        if (pendingImagePath) {
+            conn.invoke("SendImageMessage", targetUserId, pendingImagePath).catch(console.error);
+            pendingImagePath = null;
+            document.getElementById("image-preview-area").style.display = "none";
+            return;
+        }
+        const text = document.getElementById("msg-input").value.trim();
+        if (!text) return;
+        conn.invoke("SendMessage", targetUserId, text).catch(console.error);
+        document.getElementById("msg-input").value = "";
+    }
+
+    document.getElementById("img-file").addEventListener("change", async function () {
+        const file = this.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+            const resp = await fetch("/Chat/UploadImage", { method: "POST", body: formData });
+            if (!resp.ok) { alert("Upload failed: " + await resp.text()); return; }
+            const data = await resp.json();
+            pendingImagePath = data.path;
+            document.getElementById("image-preview").src = pendingImagePath;
+            document.getElementById("image-preview-area").style.display = "block";
+        } catch (e) { alert("Upload error: " + e); }
+        this.value = "";
+    });
+
+    document.getElementById("cancel-image").addEventListener("click", () => {
+        pendingImagePath = null;
+        document.getElementById("image-preview-area").style.display = "none";
+    });
+
+    function appendMessage(msg) {
+        const isMine = msg.senderId === myUserId;
+        const wrapper = document.createElement("div");
+        wrapper.className = "d-flex mb-3 " + (isMine ? "justify-content-end" : "justify-content-start");
+        let inner = "";
+        if (msg.imagePath) {
+            inner += `<a href="${msg.imagePath}" target="_blank">
+                        <img src="${msg.imagePath}" style="max-width:220px;max-height:220px;border-radius:6px;" />
+                      </a>`;
+        }
+        if (msg.message) inner += `<div>${escHtml(msg.message)}</div>`;
+        inner += `<small class="d-block ${isMine ? "text-white-50" : "text-muted"}" style="font-size:11px;">${msg.sentAt}</small>`;
+        wrapper.innerHTML = `<div class="${isMine ? "bg-primary text-white" : "bg-light text-dark"} rounded p-2"
+                                   style="max-width:70%;word-break:break-word;">${inner}</div>`;
+        document.getElementById("chat-end").before(wrapper);
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function scrollToBottom() {
+        const box = document.getElementById("chat-box");
+        box.scrollTop = box.scrollHeight;
+    }
+
+    scrollToBottom();
+})();
+</script>
+}
+}

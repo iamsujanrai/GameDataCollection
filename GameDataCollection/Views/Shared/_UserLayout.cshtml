@@ -42,6 +42,16 @@
                 </li>
             </ul>
 
+            <!-- Chat notification -->
+            <ul class="navbar-nav ml-auto mr-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="/Chat/Index" title="Messages">
+                        <i class="fas fa-comments"></i>
+                        <span id="chat-badge" class="badge badge-danger navbar-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+            </ul>
+
             <!-- SEARCH FORM -->
             <form class="form-inline ml-3">
                 <div class="input-group input-group-sm">
@@ -91,6 +101,15 @@
                             <a href="/Spin/Index" class="nav-link">
                                 <i class="nav-icon fas fa-sync-alt"></i>
                                 <p>Spin Wheel</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Chat/Index" class="nav-link">
+                                <i class="nav-icon fas fa-comments"></i>
+                                <p>
+                                    Messages
+                                    <span id="chat-badge-sidebar" class="right badge badge-danger" style="display:none;">0</span>
+                                </p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -197,6 +216,41 @@
 
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await Component.InvokeAsync("Notyf")
+
+    <!-- SignalR + shared chat connection (must be BEFORE RenderSection so pages can use window.chatHubConn) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        function updateChatBadge(count) {
+            const badge = document.getElementById("chat-badge");
+            const badgeSidebar = document.getElementById("chat-badge-sidebar");
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = "";
+                if (badgeSidebar) { badgeSidebar.textContent = count; badgeSidebar.style.display = ""; }
+            } else {
+                badge.style.display = "none";
+                if (badgeSidebar) badgeSidebar.style.display = "none";
+            }
+        }
+
+        window.chatHubConn = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        window.chatHubConn.on("NewMessageNotification", function () {
+            fetch("/Chat/UnreadCount").then(r => r.json()).then(updateChatBadge);
+            const icon = document.querySelector("#chat-badge")?.closest("a");
+            if (icon) {
+                icon.classList.add("text-warning");
+                setTimeout(() => icon.classList.remove("text-warning"), 2000);
+            }
+        });
+
+        fetch("/Chat/UnreadCount").then(r => r.json()).then(updateChatBadge);
+        window.chatHubConn.start().catch(console.error);
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

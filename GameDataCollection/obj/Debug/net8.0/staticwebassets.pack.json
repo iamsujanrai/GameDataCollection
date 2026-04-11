@@ -513,6 +513,10 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\manifest.json",
+      "PackagePath": "staticwebassets\\manifest.json"
+    },
+    {
       "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\plugins\\.npmignore",
       "PackagePath": "staticwebassets\\plugins\\.npmignore"
     },
@@ -7663,6 +7667,34 @@
     {
       "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\plugins\\toastr\\toastr.min.js",
       "PackagePath": "staticwebassets\\plugins\\toastr\\toastr.min.js"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\165f3ed7-a9e9-4f91-a756-09f88125a59f.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\165f3ed7-a9e9-4f91-a756-09f88125a59f.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\1adc0998-f63e-41d4-a8bd-814b77c8d006.jpg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\1adc0998-f63e-41d4-a8bd-814b77c8d006.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\3b871860-680b-4d42-8a9c-ef1139b4f372.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\3b871860-680b-4d42-8a9c-ef1139b4f372.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\a5c60516-4ed3-4995-85fd-51a031ad2eed.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\a5c60516-4ed3-4995-85fd-51a031ad2eed.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\c0e1828a-9504-47fc-8cc4-91b8b3b6f864.jpg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\c0e1828a-9504-47fc-8cc4-91b8b3b6f864.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\cc467a39-aa42-4782-8e12-468207a1a634.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\cc467a39-aa42-4782-8e12-468207a1a634.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\source\\repos\\GameDataCollection\\GameDataCollection\\wwwroot\\uploads\\chat\\efff80e9-e281-4602-b71d-b432f225d615.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\chat\\efff80e9-e281-4602-b71d-b432f225d615.jpeg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GameDataCollection.Microsoft.AspNetCore.StaticWebAssets.props",
