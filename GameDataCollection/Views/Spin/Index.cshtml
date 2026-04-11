@@ -1,233 +1,542 @@
 @model List<GameDataCollection.Models.SpinPrize>
 @{
-    ViewData["Title"] = "Spin";
-    Layout = "_UserLayout";
+    ViewData["Title"] = "Lucky Wheel";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucky Wheel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100dvh;
+            background: radial-gradient(ellipse at 60% 40%, #3b1170 0%, #1a0540 45%, #0a001f 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Stars ── */
+        .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+        }
+        @@keyframes twinkle {
+            0%,100% { opacity: .15; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.4); }
+        }
+
+        /* ── Decorative sparkles ── */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            font-size: var(--sz, 18px);
+            animation: float var(--d, 4s) ease-in-out infinite var(--delay, 0s);
+            z-index: 0;
+            opacity: .65;
+        }
+        @@keyframes float {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            50%      { transform: translateY(-14px) rotate(20deg); }
+        }
+
+        /* ── Layout ── */
+        .page {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            gap: 0;
+        }
+
+        /* ── Back ── */
+        .back-btn {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 10;
+            color: #ffd700;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,215,0,.3);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            text-decoration: none;
+            backdrop-filter: blur(6px);
+            transition: background .2s;
+        }
+        .back-btn:hover { background: rgba(255,215,0,.2); color: #ffd700; }
+
+        /* ── Title ── */
+        .title-wrap { text-align: center; margin-bottom: 10px; }
+
+        .lucky-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #ffd700;
+            text-transform: uppercase;
+            opacity: .75;
+        }
+
+        .lucky-title {
+            font-size: clamp(28px, 6vw, 46px);
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #fff7a0 0%, #ffd700 40%, #ff9900 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 2px 8px rgba(255,180,0,.7));
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            margin-top: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,.55);
+            max-width: 300px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* ── Wheel stage ── */
+        .stage-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0 6px;
+        }
+
+        .stage {
+            position: relative;
+            width: 340px;
+            height: 340px;
+        }
+
+        /* Glow ring behind wheel */
+        .stage::before {
+            content: '';
+            position: absolute;
+            inset: -18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,.18) 0%, transparent 70%);
+            animation: pulseGlow 2.5s ease-in-out infinite;
+        }
+        @@keyframes pulseGlow {
+            0%,100% { opacity: .6; transform: scale(1); }
+            50%      { opacity: 1;  transform: scale(1.06); }
+        }
+
+        canvas {
+            display: block;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            transform-origin: 50% 50%;
+        }
+
+        /* Pointer */
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left:  16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top:   30px solid #ffd700;
+            z-index: 5;
+            filter: drop-shadow(0 2px 6px rgba(255,180,0,.8));
+        }
+        .pointer::after {
+            content: '';
+            position: absolute;
+            top: -32px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #fff7a0, #ffd700);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        /* ── SPIN button ── */
+        .spin-btn-wrap { margin-top: 14px; }
+
+        #spinBtn {
+            padding: 14px 56px;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(180deg, #30e8e8 0%, #00b5b5 50%, #008f8f 100%);
+            box-shadow:
+                0 0 0 3px rgba(0,200,200,.3),
+                0 0 20px rgba(0,200,200,.5),
+                inset 0 1px 0 rgba(255,255,255,.3);
+            transition: transform .15s, box-shadow .15s;
+            position: relative;
+            overflow: hidden;
+        }
+        #spinBtn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+        @@keyframes shimmer {
+            0%   { left: -100%; }
+            100% { left: 200%; }
+        }
+        #spinBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow:
+                0 0 0 3px rgba(0,200,200,.4),
+                0 4px 28px rgba(0,200,200,.7),
+                inset 0 1px 0 rgba(255,255,255,.3);
+        }
+        #spinBtn:active:not(:disabled) { transform: translateY(0); }
+        #spinBtn:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            animation: none;
+        }
+        #spinBtn:disabled::before { display: none; }
+
+        /* ── Status & Winner ── */
+        .status-wrap { min-height: 52px; text-align: center; margin-top: 10px; }
+
+        #status {
+            font-size: 13px;
+            color: rgba(255,255,255,.5);
+        }
+
+        #winner {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 6px;
+            color: #ffd700;
+            text-shadow: 0 0 12px rgba(255,215,0,.6);
+        }
+        #winner.error { color: #ff6b6b; text-shadow: none; }
+
+        /* ── Responsive ── */
+        @@media (max-width: 400px) {
+            .stage, canvas { width: 290px; height: 290px; }
+        }
+    </style>
+</head>
+<body>
 
 @Html.AntiForgeryToken()
 
-<div class="spin-page">
-    <div class="spin-card">
-        <a href="@Url.Action("Index", "UserDashboard")" class="btn btn-secondary btn-sm mb-3">
-            &larr; Back to Dashboard
-        </a>
-        <h2 class="spin-title">🎡 Spin Wheel</h2>
+<!-- Stars -->
+<div class="stars" id="stars"></div>
 
+<!-- Floating sparkles -->
+<span class="sparkle" style="--sz:22px;--d:3.5s;--delay:0s;top:8%;left:5%;">✦</span>
+<span class="sparkle" style="--sz:14px;--d:4s;--delay:.5s;top:15%;left:88%;">✧</span>
+<span class="sparkle" style="--sz:18px;--d:5s;--delay:1s;top:72%;left:4%;">✦</span>
+<span class="sparkle" style="--sz:12px;--d:3s;--delay:1.5s;top:80%;left:92%;">✧</span>
+<span class="sparkle" style="--sz:20px;--d:4.5s;--delay:.3s;top:40%;left:93%;">✦</span>
+<span class="sparkle" style="--sz:16px;--d:3.8s;--delay:.8s;top:55%;left:2%;">★</span>
+<span class="sparkle" style="--sz:10px;--d:2.8s;--delay:2s;top:25%;left:75%;">✦</span>
+<span class="sparkle" style="--sz:24px;--d:5.5s;--delay:.2s;top:60%;left:82%;">✧</span>
+
+<!-- Back -->
+<a href="@Url.Action("Index", "UserDashboard")" class="back-btn">&#8592; Dashboard</a>
+
+<div class="page">
+    <!-- Title -->
+    <div class="title-wrap">
+        <div class="lucky-label">&#9733; Try Your Luck &#9733;</div>
+        <div class="lucky-title">Lucky Wheel</div>
+        <div class="subtitle">Spin the wheel and win amazing prizes every day!</div>
+    </div>
+
+    <!-- Wheel -->
+    <div class="stage-wrap">
         <div class="stage">
             <div class="pointer"></div>
-            <canvas id="wheel" width="360" height="360"></canvas>
+            <canvas id="wheel" width="340" height="340"></canvas>
         </div>
+    </div>
 
-        <div class="btns">
-            <button id="spinBtn" type="button">Spin</button>
-        </div>
+    <!-- Spin button -->
+    <div class="spin-btn-wrap">
+        <button id="spinBtn" type="button">SPIN</button>
+    </div>
 
-        <div id="status" class="status">Click Spin to try your luck!</div>
-        <div id="winner" class="winner"></div>
+    <!-- Feedback -->
+    <div class="status-wrap">
+        <div id="status">Tap SPIN to try your luck!</div>
+        <div id="winner"></div>
     </div>
 </div>
 
-<style>
-    .spin-page {
-        min-height: calc(100vh - 120px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .spin-card {
-        width: 420px;
-        text-align: center;
-        padding: 20px;
-        border-radius: 16px;
-        background: #fff;
-        box-shadow: 0 10px 30px rgba(0,0,0,.12);
-    }
-
-    .spin-title {
-        margin: 0 0 10px;
-    }
-
-    .stage {
-        position: relative;
-        width: 360px;
-        height: 360px;
-        margin: 14px auto;
-    }
-
-    canvas {
-        width: 360px;
-        height: 360px;
-        border-radius: 50%;
-        box-shadow: 0 10px 30px rgba(0,0,0,.15);
-        transform-origin: 50% 50%;
-        background: #fff;
-    }
-
-    .pointer {
-        position: absolute;
-        top: -6px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 14px solid transparent;
-        border-right: 14px solid transparent;
-        border-bottom: 22px solid #111;
-        z-index: 2;
-    }
-
-    .btns {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    #spinBtn {
-        padding: 10px 24px;
-        cursor: pointer;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-        background: #111;
-        color: #fff;
-        font-size: 16px;
-    }
-
-        #spinBtn:disabled {
-            opacity: .5;
-            cursor: not-allowed;
-        }
-
-    .status {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #333;
-    }
-
-    .winner {
-        margin-top: 10px;
-        font-weight: 700;
-        font-size: 18px;
-        color: #28a745;
-    }
-
-    .winner.error {
-        color: #dc3545;
-    }
-</style>
 <script>
-    // Prize list from server (dynamic)
+    // ── Generate stars ──────────────────────────────────────
+    (function () {
+        const c = document.getElementById('stars');
+        for (let i = 0; i < 80; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            const sz = Math.random() * 2.5 + 0.5;
+            s.style.cssText = `
+                width:${sz}px; height:${sz}px;
+                top:${Math.random()*100}%;
+                left:${Math.random()*100}%;
+                --d:${(Math.random()*4+2).toFixed(1)}s;
+                --delay:-${(Math.random()*4).toFixed(1)}s;
+            `;
+            c.appendChild(s);
+        }
+    })();
+
+    // ── Prize data ──────────────────────────────────────────
     const items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
         Model.Select(p => new { title = p.Label })));
 
-    const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
-    const statusEl = document.getElementById("status");
-    const winnerEl = document.getElementById("winner");
-    const spinBtn = document.getElementById("spinBtn");
+    const canvas  = document.getElementById('wheel');
+    const ctx     = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const winnerEl = document.getElementById('winner');
+    const spinBtn  = document.getElementById('spinBtn');
 
     let totalRotation = 0;
-    let isSpinning = false;
+    let isSpinning    = false;
 
-    function hslColor(i, n) {
-        const hue = Math.round((i * 360) / n);
-        return `hsl(${hue} 70% 55%)`;
+    // ── Segment colours: alternating deep / mid blue ────────
+    const SEG_COLORS = ['#0d2f8e', '#1a4ec8'];
+
+    // ── Fit text into a max pixel width ─────────────────────
+    function fitText(text, maxW, maxFont, minFont) {
+        let size = maxFont;
+        ctx.font = `bold ${size}px Arial`;
+        while (ctx.measureText(text).width > maxW && size > minFont) {
+            size -= 1;
+            ctx.font = `bold ${size}px Arial`;
+        }
+        return size;
     }
 
+    // ── Draw wrapped radial text ─────────────────────────────
+    function drawSegText(text, maxW, midR, arc) {
+        const words = text.split(' ');
+        let lines = [];
+
+        // Try single line first
+        ctx.font = 'bold 12px Arial';
+        if (ctx.measureText(text).width <= maxW) {
+            lines = [text];
+        } else {
+            // Split into up to 2 lines
+            let line1 = '', line2 = '';
+            for (let w of words) {
+                const test = line1 ? line1 + ' ' + w : w;
+                if (ctx.measureText(test).width <= maxW) {
+                    line1 = test;
+                } else {
+                    line2 = line2 ? line2 + ' ' + w : w;
+                }
+            }
+            lines = line2 ? [line1, line2] : [line1];
+        }
+
+        // Auto-size font
+        const lineH = 13;
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign  = 'right';
+
+        const startY = -(lines.length - 1) * lineH / 2;
+        lines.forEach((ln, i) => {
+            fitText(ln, maxW, 13, 8);
+            ctx.fillText(ln, midR - 8, startY + i * lineH + 4);
+        });
+    }
+
+    // ── Main draw ────────────────────────────────────────────
     function drawWheel() {
         const w = canvas.width, h = canvas.height;
         const cx = w / 2, cy = h / 2;
-        const radius = Math.min(cx, cy) - 6;
+        const outerR  = Math.min(cx, cy) - 2;   // gold rim outer
+        const rimW    = 26;                       // gold rim width
+        const wheelR  = outerR - rimW;            // coloured segments radius
+        const n       = items.length;
+        const arc     = (Math.PI * 2) / n;
 
         ctx.clearRect(0, 0, w, h);
 
-        const n = items.length;
-        const arc = (Math.PI * 2) / n;
+        // ── Gold outer rim ──
+        const goldGrad = ctx.createRadialGradient(cx, cy, wheelR + 2, cx, cy, outerR);
+        goldGrad.addColorStop(0,   '#c8960c');
+        goldGrad.addColorStop(0.3, '#ffd700');
+        goldGrad.addColorStop(0.6, '#ffea70');
+        goldGrad.addColorStop(1,   '#b87a00');
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+        ctx.fillStyle = goldGrad;
+        ctx.fill();
 
+        // ── Segments ──
         for (let i = 0; i < n; i++) {
             const start = i * arc;
-            const end = start + arc;
+            const end   = start + arc;
 
             ctx.beginPath();
             ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, radius, start, end);
+            ctx.arc(cx, cy, wheelR, start, end);
             ctx.closePath();
-            ctx.fillStyle = hslColor(i, n);
+            ctx.fillStyle = SEG_COLORS[i % 2];
             ctx.fill();
 
+            // Subtle inner highlight
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, wheelR, start, start + arc * 0.12);
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = wheelR;
+            ctx.stroke();
+        }
+
+        // ── Gold segment dividers ──
+        for (let i = 0; i < n; i++) {
+            const angle = i * arc;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + wheelR * Math.cos(angle), cy + wheelR * Math.sin(angle));
+            ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
+
+        // ── Text on each segment ──
+        const midR = wheelR * 0.63;        // text midpoint radially
+        const maxTextW = wheelR * 0.55;    // max text width
+
+        for (let i = 0; i < n; i++) {
+            const start = i * arc;
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(start + arc / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = "#111";
-            ctx.font = "bold 16px Arial";
-            ctx.fillText(items[i].title, radius - 12, 5);
+            drawSegText(items[i].title, maxTextW, wheelR, arc);
             ctx.restore();
         }
 
-        // Center circle
+        // ── Gold studs on rim ──
+        const numStuds  = Math.max(n * 4, 24);
+        const studRing  = outerR - rimW / 2 + 2;
+        const studRad   = 4.5;
+        for (let i = 0; i < numStuds; i++) {
+            const a  = (i / numStuds) * Math.PI * 2;
+            const sx = cx + studRing * Math.cos(a);
+            const sy = cy + studRing * Math.sin(a);
+
+            const sg = ctx.createRadialGradient(sx - 1, sy - 1, 1, sx, sy, studRad);
+            sg.addColorStop(0, '#fff9d0');
+            sg.addColorStop(1, '#b87a00');
+            ctx.beginPath();
+            ctx.arc(sx, sy, studRad, 0, Math.PI * 2);
+            ctx.fillStyle = sg;
+            ctx.fill();
+        }
+
+        // ── Center hub ──
+        // Outer dark ring
         ctx.beginPath();
-        ctx.arc(cx, cy, 34, 0, Math.PI * 2);
-        ctx.fillStyle = "#fff";
+        ctx.arc(cx, cy, 32, 0, Math.PI * 2);
+        ctx.fillStyle = '#050f40';
         ctx.fill();
-        ctx.strokeStyle = "rgba(0,0,0,.1)";
-        ctx.stroke();
 
-        ctx.fillStyle = "#111";
-        ctx.font = "bold 14px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("SPIN", cx, cy + 5);
+        // Gold ring
+        const hubGold = ctx.createLinearGradient(cx - 28, cy - 28, cx + 28, cy + 28);
+        hubGold.addColorStop(0, '#ffd700');
+        hubGold.addColorStop(0.5, '#ffea70');
+        hubGold.addColorStop(1, '#c8960c');
+        ctx.beginPath();
+        ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+        ctx.fillStyle = hubGold;
+        ctx.fill();
+
+        // Inner blue circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, 20, 0, Math.PI * 2);
+        ctx.fillStyle = '#0d2f8e';
+        ctx.fill();
+
+        // Star icon in center
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('★', cx, cy);
+        ctx.textBaseline = 'alphabetic';
     }
 
+    // ── Rotation helper ──────────────────────────────────────
     function setWheelRotation(deg) {
-        canvas.style.transition = "transform 5s cubic-bezier(.17,.67,.12,1)";
-        canvas.style.transform = `rotate(${deg}deg)`;
+        canvas.style.transition = 'transform 5s cubic-bezier(.17,.67,.12,1)';
+        canvas.style.transform  = `rotate(${deg}deg)`;
     }
 
+    // ── Spin handler ─────────────────────────────────────────
     async function spin() {
         if (isSpinning) return;
-
         isSpinning = true;
         spinBtn.disabled = true;
-        winnerEl.textContent = "";
-        winnerEl.className = "winner";
-        statusEl.textContent = "Spinning…";
+        winnerEl.textContent = '';
+        winnerEl.className   = 'winner';
+        statusEl.textContent = 'Spinning…';
 
         const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
         let data;
         try {
-            const res = await fetch("/Spin/Spin", {
-                method: "POST",
-                headers: { "RequestVerificationToken": token }
+            const res = await fetch('/Spin/Spin', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
             });
-
             data = await res.json();
-
             if (!res.ok) {
-                winnerEl.textContent = data.message || "Spin failed.";
-                winnerEl.className = "winner error";
-                statusEl.textContent = "";
-                isSpinning = false;
-                spinBtn.disabled = false;
+                winnerEl.textContent = data.message || 'Spin failed.';
+                winnerEl.className   = 'winner error';
+                statusEl.textContent = '';
+                isSpinning = false; spinBtn.disabled = false;
                 return;
             }
-        } catch (e) {
-            winnerEl.textContent = "Network error. Please try again.";
-            winnerEl.className = "winner error";
-            statusEl.textContent = "";
-            isSpinning = false;
-            spinBtn.disabled = false;
+        } catch {
+            winnerEl.textContent = 'Network error. Please try again.';
+            winnerEl.className   = 'winner error';
+            statusEl.textContent = '';
+            isSpinning = false; spinBtn.disabled = false;
             return;
         }
 
-        // Compute exact rotation so pointer lands on the winning segment
-        const sliceAngle = 360 / items.length;
-        // Canvas draws slices from 0° (3-o'clock), pointer is fixed at 270° (12-o'clock).
-        // After CSS clockwise rotation X, pointer aligns with canvas angle (270 - X) % 360.
-        // To land on center of prizeIndex: X = (270 - (prizeIndex*sliceAngle + sliceAngle/2) + 360) % 360
+        // Compute exact rotation to land on winning segment
+        const sliceAngle  = 360 / items.length;
         const targetAngle = (270 - (data.prizeIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
         const currentAngle = totalRotation % 360;
         let delta = targetAngle - currentAngle;
@@ -236,16 +545,16 @@
         setWheelRotation(totalRotation);
 
         setTimeout(() => {
-            statusEl.textContent = "Done! 🎉";
+            statusEl.textContent = '🎉 Congratulations!';
             winnerEl.textContent = `You won: ${data.prizeLabel}!`;
-            winnerEl.className = "winner";
+            winnerEl.className   = 'winner';
             isSpinning = false;
             spinBtn.disabled = false;
-        }, 5100);
+        }, 5200);
     }
 
-    spinBtn.addEventListener("click", spin);
-
-    // Draw wheel on load
+    spinBtn.addEventListener('click', spin);
     drawWheel();
 </script>
+</body>
+</html>

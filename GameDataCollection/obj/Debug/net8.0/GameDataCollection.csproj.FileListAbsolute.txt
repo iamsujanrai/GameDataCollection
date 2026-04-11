@@ -523,3 +523,11 @@ C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.WebPages.Razor.dll
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\System.Web.WebPages.dll
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\Microsoft.Web.Infrastructure.dll
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\web.config
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\appsettings.Development.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\appsettings.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\GameDataCollection.deps.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\GameDataCollection.runtimeconfig.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\manifest.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\plugins\daterangepicker\bower.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\plugins\raphael\bower.json
