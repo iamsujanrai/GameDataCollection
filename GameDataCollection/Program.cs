@@ -37,8 +37,8 @@ builder.Services.AddHostedService<EmailScheduler>();
 builder.Services.AddSignalR();
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Login/Login";
-    options.AccessDeniedPath = "/Login/AccessDenied";
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
 });
 builder.Services.AddNotyf(config => { config.DurationInSeconds = 5; config.IsDismissable = true; config.Position = NotyfPosition.TopRight; });
 

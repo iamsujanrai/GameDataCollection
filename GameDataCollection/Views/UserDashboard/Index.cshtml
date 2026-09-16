@@ -74,16 +74,6 @@
                         <dd class="col-sm-7">@Model.GameRecord.PhoneNumber</dd>
                         <dt class="col-sm-5">Registered</dt>
                         <dd class="col-sm-7">@Model.GameRecord.CreatedDateTime.ToString("MMM dd, yyyy")</dd>
-                        <dt class="col-sm-5">Expires</dt>
-                        <dd class="col-sm-7">
-                            @{
-                                var isExpired = Model.GameRecord.ExpiryDateTime < DateTime.Now;
-                            }
-                            <span class="badge badge-@(isExpired ? "danger" : "success") p-1">
-                                @Model.GameRecord.ExpiryDateTime.ToString("MMM dd, yyyy")
-                                @(isExpired ? "(Expired)" : "(Active)")
-                            </span>
-                        </dd>
                     </dl>
                 }
                 else

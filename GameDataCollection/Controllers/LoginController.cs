@@ -1,4 +1,5 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace GameDataCollection.Controllers
@@ -122,6 +124,94 @@ namespace GameDataCollection.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
+        [Route("ForgotPassword")]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                _notyf.Error("Please enter a valid email address.");
+                return View(vm);
+            }
+
+            var normalized = _userManager.NormalizeEmail(vm.Email.Trim());
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.NormalizedEmail == normalized || u.NormalizedUserName == normalized);
+
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetUrl = Url.Action("ResetPassword", "Login", new { userId = user.Id, token }, Request.Scheme);
+                var to = user.Email;
+                var body = EmailSender.PasswordResetTemplate(user.FullName, resetUrl);
+
+                // Send in the background so the response time doesn't reveal whether the account exists
+                _ = Task.Run(() => EmailSender.EmailSend(to, "Reset your Aliyah Gaming password", body));
+            }
+
+            // Same message whether or not the account exists, so this page can't be used to find registered emails
+            ViewBag.Sent = true;
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("ResetPassword")]
+        public IActionResult ResetPassword(string? userId, string? token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                _notyf.Error("This password reset link is invalid.");
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+            return View(new ResetPasswordViewModel { UserId = userId, Token = token });
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var user = await _userManager.FindByIdAsync(vm.UserId);
+            var result = user == null
+                ? IdentityResult.Failed(new IdentityError { Code = "InvalidToken" })
+                : await _userManager.ResetPasswordAsync(user, vm.Token, vm.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                if (result.Errors.Any(e => e.Code == "InvalidToken"))
+                {
+                    _notyf.Error("This password reset link is invalid or has expired. Please request a new one.");
+                    return RedirectToAction(nameof(ForgotPassword));
+                }
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(vm);
+            }
+
+            // Unlock the account in case it was locked by earlier failed logins
+            await _userManager.SetLockoutEndDateAsync(user!, null);
+            await _userManager.ResetAccessFailedCountAsync(user!);
+
+            _notyf.Success("Your password has been reset. Please log in.");
+            return RedirectToAction(nameof(Login));
+        }
+
+        [AllowAnonymous]
+        [Route("AccessDenied")]
         public IActionResult AccessDenied()
         {
             return View();

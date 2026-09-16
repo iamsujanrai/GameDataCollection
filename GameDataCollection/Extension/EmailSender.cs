@@ -76,6 +76,22 @@ namespace GameDataCollection.Extension
         {
             return $"Congratulations {name}, You have successfully registered on Aliyah’s Platform. You are now eligible for Monthly bonus and Many more. Terms and Conditions applied. Free free to text us on our Facebook page or Messenger if any confusion. Hope you have a wonderful here ❤️";
         }
+        public static string AccountCreatedTemplate(string name, string email, string password, string? loginUrl)
+        {
+            return $@"<p>{WebUtility.HtmlEncode(RegisterTemplate(name))}</p>
+<p>We have created an account for you. Use these details to log in:</p>
+<p><strong>Username:</strong> {WebUtility.HtmlEncode(email)}<br/>
+<strong>Password:</strong> {WebUtility.HtmlEncode(password)}</p>
+<p><a href='{loginUrl}'>Log in here</a></p>
+<p>Please keep this password safe and do not share it with anyone. You can change it any time from <strong>Change Password</strong> after logging in.</p>";
+        }
+        public static string PasswordResetTemplate(string name, string? resetUrl)
+        {
+            return $@"<p>Hi {WebUtility.HtmlEncode(name)},</p>
+<p>We received a request to reset your Aliyah Gaming password. Click the link below to choose a new password:</p>
+<p><a href='{WebUtility.HtmlEncode(resetUrl)}'>Reset my password</a></p>
+<p>This link expires in 24 hours. If you didn't ask to reset your password, you can ignore this email.</p>";
+        }
         public static string RegisterVerify(string name)
         {
             return $"“{name}” have been successfully registered on Aliyah Gaming.";

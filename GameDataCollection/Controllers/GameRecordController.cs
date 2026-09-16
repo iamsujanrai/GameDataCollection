@@ -5,10 +5,12 @@ using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace GameDataCollection.Controllers
@@ -20,14 +22,16 @@ namespace GameDataCollection.Controllers
         private readonly INotyfService _notyf;
         private readonly IEmailSetupService _emailSetupService;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly UserManager<User> _userManager;
 
-        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf,IEmailSetupService emailSetupService, IHttpClientFactory clientFactory)
+        public GameRecordController(UserDbContext context, IGameRecordService gameRecordService, INotyfService notyf,IEmailSetupService emailSetupService, IHttpClientFactory clientFactory, UserManager<User> userManager)
         {
             _context = context;
             _gameRecordService = gameRecordService;
             _notyf = notyf;
             _emailSetupService = emailSetupService;
             _clientFactory = clientFactory;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -96,9 +100,20 @@ namespace GameDataCollection.Controllers
                 var gameRecord = GetGameRecordFromVM(vm);
                 await _gameRecordService.Save(gameRecord);
 
+                // Create a login account for the user
+                var password = await CreateUserAccount(vm);
+
                 // Send emails
                 _notyf.Success("Thanks for registering!");
-                EmailSender.EmailSend(vm.Email, "Thank you for registering", EmailSender.RegisterTemplate(vm.FullName));
+                if (password != null)
+                {
+                    var loginUrl = Url.Action("Login", "Login", null, Request.Scheme);
+                    EmailSender.EmailSend(vm.Email.Trim(), "Your Aliyah Gaming account", EmailSender.AccountCreatedTemplate(vm.FullName, vm.Email.Trim(), password, loginUrl));
+                }
+                else
+                {
+                    EmailSender.EmailSend(vm.Email, "Thank you for registering", EmailSender.RegisterTemplate(vm.FullName));
+                }
 
                 var listOfEmail = _emailSetupService.GetAll().Result.Where(a => a.IsActive).ToList();
                 // You can uncomment this if you want to notify internal members
@@ -197,6 +212,51 @@ namespace GameDataCollection.Controllers
             return Redirect("/admin/index");
         }
 
+        // Returns the generated password, or null if an account already exists or couldn't be created
+        private async Task<string?> CreateUserAccount(GameRecordViewModel vm)
+        {
+            var email = vm.Email.Trim();
+            var normalized = _userManager.NormalizeEmail(email);
+            var exists = await _userManager.Users
+                .AnyAsync(u => u.NormalizedEmail == normalized || u.NormalizedUserName == normalized);
+            if (exists) return null;
+
+            var user = new User
+            {
+                UserName = email,
+                Email = email,
+                FullName = vm.FullName,
+                PhoneNumber = vm.PhoneNumber,
+                EmailConfirmed = true
+            };
+
+            var password = GeneratePassword();
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded) return null;
+
+            await _userManager.AddToRoleAsync(user, Roles.User);
+            return password;
+        }
+
+        // 10 characters with at least one uppercase, lowercase, digit and symbol (Identity's default rules).
+        // Look-alike characters such as 0/O and 1/l/I are left out so the password is easy to type.
+        private static string GeneratePassword()
+        {
+            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+            const string lower = "abcdefghijkmnpqrstuvwxyz";
+            const string digits = "23456789";
+            const string symbols = "@#$%*!";
+
+            var chars = RandomNumberGenerator.GetItems<char>(upper + lower + digits + symbols, 6)
+                .Concat(RandomNumberGenerator.GetItems<char>(upper, 1))
+                .Concat(RandomNumberGenerator.GetItems<char>(lower, 1))
+                .Concat(RandomNumberGenerator.GetItems<char>(digits, 1))
+                .Concat(RandomNumberGenerator.GetItems<char>(symbols, 1))
+                .ToArray();
+            RandomNumberGenerator.Shuffle<char>(chars);
+            return new string(chars);
+        }
+
         private static GameRecord GetGameRecordFromVM(GameRecordViewModel vm)
         {
             return new GameRecord()
@@ -230,7 +290,7 @@ namespace GameDataCollection.Controllers
             })];
         }
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public IActionResult Congratulation()
         {
             return View();

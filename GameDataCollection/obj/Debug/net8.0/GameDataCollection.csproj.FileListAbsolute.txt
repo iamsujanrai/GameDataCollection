@@ -502,15 +502,9 @@ C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.sourcelink.json
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets.development.json
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets\msbuild.GameDataCollection.Microsoft.AspNetCore.StaticWebAssets.props
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets\msbuild.build.GameDataCollection.props
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.GameDataCollection.props
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.GameDataCollection.props
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\scopedcss\bundle\GameDataCollection.styles.css
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\scopedcss\projectbundle\GameDataCollection.bundle.scp.css
-C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.csproj.CopyComplete
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.dll
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\refint\GameDataCollection.dll
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameDataCollection.pdb
@@ -531,3 +525,11 @@ C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\manifest.json
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\plugins\daterangepicker\bower.json
 C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\publish-output\wwwroot\plugins\raphael\bower.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\bin\Debug\net8.0\GameDataCollection.staticwebassets.endpoints.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Dell\source\repos\GameDataCollection\GameDataCollection\obj\Debug\net8.0\GameData.8811AB10.Up2Date

@@ -1,3 +1,4 @@
+using AspNetCoreHero.ToastNotification.Abstractions;
 using GameDataCollection.DbContext;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
@@ -16,12 +17,16 @@ namespace GameDataCollection.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ISpinService _spinService;
         private readonly UserDbContext _db;
+        private readonly SignInManager<User> _signInManager;
+        private readonly INotyfService _notyf;
 
-        public UserDashboardController(UserManager<User> userManager, ISpinService spinService, UserDbContext db)
+        public UserDashboardController(UserManager<User> userManager, ISpinService spinService, UserDbContext db, SignInManager<User> signInManager, INotyfService notyf)
         {
             _userManager = userManager;
             _spinService = spinService;
             _db = db;
+            _signInManager = signInManager;
+            _notyf = notyf;
         }
 
         public async Task<IActionResult> Index()
@@ -55,6 +60,37 @@ namespace GameDataCollection.Controllers
             };
 
             return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return RedirectToAction("Login", "Login");
+
+            var result = await _userManager.ChangePasswordAsync(user, vm.OldPassword, vm.NewPassword);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(vm);
+            }
+
+            // Changing the password updates the security stamp; refresh the cookie so the user stays logged in
+            await _signInManager.RefreshSignInAsync(user);
+            _notyf.Success("Password changed successfully.");
+            return RedirectToAction(nameof(ChangePassword));
         }
     }
 }
