@@ -11,7 +11,7 @@ namespace GameDataCollection.ViewModels
         public string Label { get; set; }
 
         [Required]
-        [Range(0.01, 100000)]
+        [Range(0, 100000, ErrorMessage = "Amount must be between 0 and 100000. Use 0 for a no-prize slice such as Better Luck Next Time.")]
         [Display(Name = "Amount ($)")]
         public decimal Amount { get; set; }
 

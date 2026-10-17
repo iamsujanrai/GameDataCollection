@@ -9,20 +9,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lucky Wheel</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             min-height: 100dvh;
-            background: radial-gradient(ellipse at 60% 40%, #3b1170 0%, #1a0540 45%, #0a001f 100%);
+            background:
+                radial-gradient(ellipse at 50% 30%, #6a1fb5 0%, #40107d 40%, #1d0646 75%, #0c0226 100%);
             font-family: 'Segoe UI', Arial, sans-serif;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* ── Stars ── */
+        /* ── Twinkling stars ── */
         .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
         .star {
             position: absolute;
@@ -35,18 +35,19 @@
             50%      { opacity: 1;   transform: scale(1.4); }
         }
 
-        /* ── Decorative sparkles ── */
+        /* ── Floating prize icons ── */
         .sparkle {
             position: fixed;
             pointer-events: none;
             font-size: var(--sz, 18px);
             animation: float var(--d, 4s) ease-in-out infinite var(--delay, 0s);
             z-index: 0;
-            opacity: .65;
+            opacity: .8;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,.5));
         }
         @@keyframes float {
-            0%,100% { transform: translateY(0) rotate(0deg); }
-            50%      { transform: translateY(-14px) rotate(20deg); }
+            0%,100% { transform: translateY(0) rotate(-8deg); }
+            50%      { transform: translateY(-16px) rotate(8deg); }
         }
 
         /* ── Layout ── */
@@ -58,8 +59,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
-            gap: 0;
+            padding: 20px 16px 28px;
         }
 
         /* ── Back ── */
@@ -81,7 +81,7 @@
         .back-btn:hover { background: rgba(255,215,0,.2); color: #ffd700; }
 
         /* ── Title ── */
-        .title-wrap { text-align: center; margin-bottom: 10px; }
+        .title-wrap { text-align: center; margin-bottom: 6px; }
 
         .lucky-label {
             font-size: 11px;
@@ -92,7 +92,7 @@
         }
 
         .lucky-title {
-            font-size: clamp(28px, 6vw, 46px);
+            font-size: clamp(26px, 6vw, 42px);
             font-weight: 900;
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -100,13 +100,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: none;
             filter: drop-shadow(0 2px 8px rgba(255,180,0,.7));
-            line-height: 1.1;
+            line-height: 1.15;
         }
 
         .subtitle {
-            margin-top: 6px;
+            margin-top: 4px;
             font-size: 12px;
             color: rgba(255,255,255,.55);
             max-width: 300px;
@@ -120,84 +119,72 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 10px 0 6px;
+            margin: 8px 0 4px;
         }
 
-        .stage {
-            position: relative;
-            width: 340px;
-            height: 340px;
-        }
+        .stage { position: relative; }
 
-        /* Glow ring behind wheel */
+        /* Glow behind the wheel */
         .stage::before {
             content: '';
             position: absolute;
-            inset: -18px;
+            inset: -22px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,215,0,.18) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,190,60,.25) 0%, transparent 70%);
             animation: pulseGlow 2.5s ease-in-out infinite;
         }
         @@keyframes pulseGlow {
-            0%,100% { opacity: .6; transform: scale(1); }
-            50%      { opacity: 1;  transform: scale(1.06); }
+            0%,100% { opacity: .55; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.06); }
         }
 
-        canvas {
+        .stage canvas {
+            position: absolute;
+            inset: 0;
             display: block;
-            width: 340px;
-            height: 340px;
-            border-radius: 50%;
-            transform-origin: 50% 50%;
         }
+        /* The segments spin, the gold frame and bulbs stay still */
+        #wheel { z-index: 2; transform-origin: 50% 50%; }
+        #frame { z-index: 3; pointer-events: none; }
 
         /* Pointer */
         .pointer {
             position: absolute;
-            top: -10px;
+            top: -16px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left:  16px solid transparent;
-            border-right: 16px solid transparent;
-            border-top:   30px solid #ffd700;
-            z-index: 5;
-            filter: drop-shadow(0 2px 6px rgba(255,180,0,.8));
+            z-index: 6;
+            filter: drop-shadow(0 3px 7px rgba(0,0,0,.55));
+            transform-origin: 50% 18%;
         }
-        .pointer::after {
-            content: '';
-            position: absolute;
-            top: -32px;
-            left: -10px;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, #fff7a0, #ffd700);
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ffd700;
+        .pointer.ticking { animation: tick .09s linear infinite; }
+        @@keyframes tick {
+            0%,100% { transform: translateX(-50%) rotate(0deg); }
+            50%      { transform: translateX(-50%) rotate(-11deg); }
         }
 
         /* ── SPIN button ── */
-        .spin-btn-wrap { margin-top: 14px; }
+        .spin-btn-wrap { margin-top: 16px; }
 
         #spinBtn {
-            padding: 14px 56px;
-            font-size: 20px;
+            padding: 15px 58px;
+            font-size: 21px;
             font-weight: 900;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: #fff;
+            color: #6a2a00;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            background: linear-gradient(180deg, #30e8e8 0%, #00b5b5 50%, #008f8f 100%);
+            background: linear-gradient(180deg, #fff6b0 0%, #ffd23f 45%, #ffa400 100%);
             box-shadow:
-                0 0 0 3px rgba(0,200,200,.3),
-                0 0 20px rgba(0,200,200,.5),
-                inset 0 1px 0 rgba(255,255,255,.3);
+                0 0 0 4px rgba(255,170,0,.25),
+                0 6px 22px rgba(255,160,0,.55),
+                inset 0 2px 0 rgba(255,255,255,.65);
             transition: transform .15s, box-shadow .15s;
             position: relative;
             overflow: hidden;
+            text-shadow: 0 1px 0 rgba(255,255,255,.5);
         }
         #spinBtn::before {
             content: '';
@@ -205,7 +192,7 @@
             top: 0; left: -100%;
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
             animation: shimmer 2.5s infinite;
         }
         @@keyframes shimmer {
@@ -215,39 +202,27 @@
         #spinBtn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow:
-                0 0 0 3px rgba(0,200,200,.4),
-                0 4px 28px rgba(0,200,200,.7),
-                inset 0 1px 0 rgba(255,255,255,.3);
+                0 0 0 4px rgba(255,170,0,.35),
+                0 10px 28px rgba(255,160,0,.7),
+                inset 0 2px 0 rgba(255,255,255,.65);
         }
         #spinBtn:active:not(:disabled) { transform: translateY(0); }
-        #spinBtn:disabled {
-            opacity: .55;
-            cursor: not-allowed;
-            animation: none;
-        }
+        #spinBtn:disabled { opacity: .55; cursor: not-allowed; }
         #spinBtn:disabled::before { display: none; }
 
         /* ── Status & Winner ── */
-        .status-wrap { min-height: 52px; text-align: center; margin-top: 10px; }
+        .status-wrap { min-height: 54px; text-align: center; margin-top: 12px; }
 
-        #status {
-            font-size: 13px;
-            color: rgba(255,255,255,.5);
-        }
+        #status { font-size: 13px; color: rgba(255,255,255,.55); }
 
         #winner {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 800;
             margin-top: 6px;
             color: #ffd700;
             text-shadow: 0 0 12px rgba(255,215,0,.6);
         }
         #winner.error { color: #ff6b6b; text-shadow: none; }
-
-        /* ── Responsive ── */
-        @@media (max-width: 400px) {
-            .stage, canvas { width: 290px; height: 290px; }
-        }
     </style>
 </head>
 <body>
@@ -257,15 +232,15 @@
 <!-- Stars -->
 <div class="stars" id="stars"></div>
 
-<!-- Floating sparkles -->
-<span class="sparkle" style="--sz:22px;--d:3.5s;--delay:0s;top:8%;left:5%;">✦</span>
-<span class="sparkle" style="--sz:14px;--d:4s;--delay:.5s;top:15%;left:88%;">✧</span>
-<span class="sparkle" style="--sz:18px;--d:5s;--delay:1s;top:72%;left:4%;">✦</span>
-<span class="sparkle" style="--sz:12px;--d:3s;--delay:1.5s;top:80%;left:92%;">✧</span>
-<span class="sparkle" style="--sz:20px;--d:4.5s;--delay:.3s;top:40%;left:93%;">✦</span>
-<span class="sparkle" style="--sz:16px;--d:3.8s;--delay:.8s;top:55%;left:2%;">★</span>
-<span class="sparkle" style="--sz:10px;--d:2.8s;--delay:2s;top:25%;left:75%;">✦</span>
-<span class="sparkle" style="--sz:24px;--d:5.5s;--delay:.2s;top:60%;left:82%;">✧</span>
+<!-- Floating prize icons -->
+<span class="sparkle" style="--sz:26px;--d:3.5s;--delay:0s;top:8%;left:5%;">&#127873;</span>
+<span class="sparkle" style="--sz:20px;--d:4s;--delay:.5s;top:15%;left:88%;">&#129689;</span>
+<span class="sparkle" style="--sz:22px;--d:5s;--delay:1s;top:72%;left:4%;">&#128142;</span>
+<span class="sparkle" style="--sz:18px;--d:3s;--delay:1.5s;top:82%;left:92%;">&#127873;</span>
+<span class="sparkle" style="--sz:24px;--d:4.5s;--delay:.3s;top:40%;left:93%;">&#11088;</span>
+<span class="sparkle" style="--sz:20px;--d:3.8s;--delay:.8s;top:55%;left:2%;">&#129689;</span>
+<span class="sparkle" style="--sz:16px;--d:2.8s;--delay:2s;top:25%;left:76%;">&#10024;</span>
+<span class="sparkle" style="--sz:26px;--d:5.5s;--delay:.2s;top:62%;left:82%;">&#127881;</span>
 
 <!-- Back -->
 <a href="@Url.Action("Index", "UserDashboard")" class="back-btn">&#8592; Dashboard</a>
@@ -280,9 +255,26 @@
 
     <!-- Wheel -->
     <div class="stage-wrap">
-        <div class="stage">
-            <div class="pointer"></div>
-            <canvas id="wheel" width="340" height="340"></canvas>
+        <div class="stage" id="stage">
+            <svg class="pointer" id="pointer" width="46" height="62" viewBox="0 0 46 62" aria-hidden="true">
+                <defs>
+                    <linearGradient id="pgGold" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fff7bd" />
+                        <stop offset="45%" stop-color="#ffd23f" />
+                        <stop offset="100%" stop-color="#c17f00" />
+                    </linearGradient>
+                    <radialGradient id="pgJewel" cx="35%" cy="30%">
+                        <stop offset="0%" stop-color="#ff8f8f" />
+                        <stop offset="60%" stop-color="#e8243c" />
+                        <stop offset="100%" stop-color="#8d0f20" />
+                    </radialGradient>
+                </defs>
+                <path d="M23 60 L6 26 A19 19 0 0 1 40 26 Z" fill="url(#pgGold)" stroke="#8a5a00" stroke-width="1.5" stroke-linejoin="round" />
+                <circle cx="23" cy="19" r="15" fill="url(#pgGold)" stroke="#8a5a00" stroke-width="1.5" />
+                <circle cx="23" cy="19" r="8" fill="url(#pgJewel)" stroke="#ffe9a8" stroke-width="1.5" />
+            </svg>
+            <canvas id="wheel"></canvas>
+            <canvas id="frame"></canvas>
         </div>
     </div>
 
@@ -299,7 +291,7 @@
 </div>
 
 <script>
-    // ── Generate stars ──────────────────────────────────────
+    // ── Background stars ─────────────────────────────────────
     (function () {
         const c = document.getElementById('stars');
         for (let i = 0; i < 80; i++) {
@@ -317,199 +309,368 @@
         }
     })();
 
-    // ── Prize data ──────────────────────────────────────────
+    // ── Prize data ───────────────────────────────────────────
     const items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        Model.Select(p => new { title = p.Label })));
+        Model.Select(p => new { title = p.Label, amount = p.Amount })));
 
-    const canvas  = document.getElementById('wheel');
-    const ctx     = canvas.getContext('2d');
+    const wheelCv  = document.getElementById('wheel');
+    const frameCv  = document.getElementById('frame');
+    const stage    = document.getElementById('stage');
+    const pointer  = document.getElementById('pointer');
     const statusEl = document.getElementById('status');
     const winnerEl = document.getElementById('winner');
     const spinBtn  = document.getElementById('spinBtn');
 
+    const wctx = wheelCv.getContext('2d');
+    const fctx = frameCv.getContext('2d');
+
     let totalRotation = 0;
     let isSpinning    = false;
+    let S             = 0;   // stage size in CSS pixels
+    let dpr           = 1;   // device pixel ratio, so the wheel stays sharp
 
-    // ── Segment colours: alternating deep / mid blue ────────
-    const SEG_COLORS = ['#0d2f8e', '#1a4ec8'];
+    // ── Segment colours (bright carnival palette) ────────────
+    // Ordered so neighbouring slices never share a hue
+    const PALETTE = [
+        ['#ff2f4e', '#c70026'],  // red
+        ['#ffc400', '#e08b00'],  // yellow
+        ['#36c94e', '#199b2f'],  // green
+        ['#17b6e8', '#0b7fab'],  // cyan
+        ['#2a7bff', '#0f46b8'],  // blue
+        ['#8a3ffc', '#5a1bbd'],  // purple
+        ['#e9318f', '#aa0b5d'],  // pink
+        ['#ff7a18', '#d14b00'],  // orange
+        ['#00c2b2', '#00897f'],  // teal
+        ['#7fc62b', '#4f8a10'],  // lime
+        ['#ff9f1a', '#cc6f00'],  // amber
+        ['#ff5fa2', '#cf2473']   // rose
+    ];
 
-    // ── Fit text into a max pixel width ─────────────────────
-    function fitText(text, maxW, maxFont, minFont) {
-        let size = maxFont;
-        ctx.font = `bold ${size}px Arial`;
-        while (ctx.measureText(text).width > maxW && size > minFont) {
+    const MONEY_ICONS   = ['\u{1F381}', '\u{1F340}', '\u{1F48E}', '\u{1F389}'];   // gift, clover, diamond, party
+    const PERCENT_ICONS = ['\u{2B50}', '\u{1F525}', '\u{1F4AF}'];                 // star, fire, 100
+    const LOSE_ICON     = '\u{1F61E}';                                            // sad face
+
+    // Split "$5 Free Play" into a big headline and a small sub-line
+    function parseLabel(label) {
+        const text = (label || '').trim();
+        const m = text.match(/^(\$\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*%)\s*(.*)$/);
+        if (m) return { head: m[1].replace(/\s+/g, ''), sub: m[2].trim(), big: true };
+
+        const words = text.split(/\s+/);
+        if (words.length <= 2) return { head: text, sub: '', big: false };
+        const half = Math.ceil(words.length / 2);
+        return { head: words.slice(0, half).join(' '), sub: words.slice(half).join(' '), big: false };
+    }
+
+    // Work out the icon, colours and "lucky prize" flag for every segment
+    const segments = (function () {
+        let money = 0, percent = 0;
+        let bestIdx = -1, bestAmount = 0;
+
+        const segs = items.map((it, i) => {
+            const label  = it.title || '';
+            const amount = Number(it.amount) || 0;
+            const parts  = parseLabel(label);
+            const isLoss = amount <= 0 && !/%/.test(label);
+
+            let icon;
+            if (isLoss)              icon = LOSE_ICON;
+            else if (/%/.test(label)) icon = PERCENT_ICONS[percent++ % PERCENT_ICONS.length];
+            else                      icon = MONEY_ICONS[money++ % MONEY_ICONS.length];
+
+            if (!isLoss && amount > bestAmount) { bestAmount = amount; bestIdx = i; }
+
+            return { label, amount, icon, isLoss, lucky: false, ...parts };
+        });
+
+        // Mark the biggest prize so it gets the LUCKY PRIZE ribbon
+        if (bestIdx >= 0 && segs.length > 2) segs[bestIdx].lucky = true;
+        return segs;
+    })();
+
+    // ── Helpers ──────────────────────────────────────────────
+    function setFont(ctx, weight, size) {
+        ctx.font = `${weight} ${size}px "Segoe UI", "Trebuchet MS", Arial, sans-serif`;
+    }
+
+    // Shrink the font until the text fits the slice at that radius
+    function fitFont(ctx, text, maxW, startSize, minSize, weight) {
+        let size = startSize;
+        setFont(ctx, weight, size);
+        while (ctx.measureText(text).width > maxW && size > minSize) {
             size -= 1;
-            ctx.font = `bold ${size}px Arial`;
+            setFont(ctx, weight, size);
         }
         return size;
     }
 
-    // ── Draw wrapped radial text ─────────────────────────────
-    function drawSegText(text, maxW, midR, arc) {
-        const words = text.split(' ');
-        let lines = [];
-
-        // Try single line first
-        ctx.font = 'bold 12px Arial';
-        if (ctx.measureText(text).width <= maxW) {
-            lines = [text];
-        } else {
-            // Split into up to 2 lines
-            let line1 = '', line2 = '';
-            for (let w of words) {
-                const test = line1 ? line1 + ' ' + w : w;
-                if (ctx.measureText(test).width <= maxW) {
-                    line1 = test;
-                } else {
-                    line2 = line2 ? line2 + ' ' + w : w;
-                }
-            }
-            lines = line2 ? [line1, line2] : [line1];
-        }
-
-        // Auto-size font
-        const lineH = 13;
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign  = 'right';
-
-        const startY = -(lines.length - 1) * lineH / 2;
-        lines.forEach((ln, i) => {
-            fitText(ln, maxW, 13, 8);
-            ctx.fillText(ln, midR - 8, startY + i * lineH + 4);
-        });
-    }
-
-    // ── Main draw ────────────────────────────────────────────
-    function drawWheel() {
-        const w = canvas.width, h = canvas.height;
-        const cx = w / 2, cy = h / 2;
-        const outerR  = Math.min(cx, cy) - 2;   // gold rim outer
-        const rimW    = 26;                       // gold rim width
-        const wheelR  = outerR - rimW;            // coloured segments radius
-        const n       = items.length;
-        const arc     = (Math.PI * 2) / n;
-
-        ctx.clearRect(0, 0, w, h);
-
-        // ── Gold outer rim ──
-        const goldGrad = ctx.createRadialGradient(cx, cy, wheelR + 2, cx, cy, outerR);
-        goldGrad.addColorStop(0,   '#c8960c');
-        goldGrad.addColorStop(0.3, '#ffd700');
-        goldGrad.addColorStop(0.6, '#ffea70');
-        goldGrad.addColorStop(1,   '#b87a00');
-        ctx.beginPath();
-        ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
-        ctx.fillStyle = goldGrad;
-        ctx.fill();
-
-        // ── Segments ──
-        for (let i = 0; i < n; i++) {
-            const start = i * arc;
-            const end   = start + arc;
-
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, wheelR, start, end);
-            ctx.closePath();
-            ctx.fillStyle = SEG_COLORS[i % 2];
-            ctx.fill();
-
-            // Subtle inner highlight
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.arc(cx, cy, wheelR, start, start + arc * 0.12);
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-            ctx.lineWidth = wheelR;
-            ctx.stroke();
-        }
-
-        // ── Gold segment dividers ──
-        for (let i = 0; i < n; i++) {
-            const angle = i * arc;
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.lineTo(cx + wheelR * Math.cos(angle), cy + wheelR * Math.sin(angle));
-            ctx.strokeStyle = 'rgba(255,215,0,0.5)';
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
-        }
-
-        // ── Text on each segment ──
-        const midR = wheelR * 0.63;        // text midpoint radially
-        const maxTextW = wheelR * 0.55;    // max text width
-
-        for (let i = 0; i < n; i++) {
-            const start = i * arc;
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(start + arc / 2);
-            drawSegText(items[i].title, maxTextW, wheelR, arc);
-            ctx.restore();
-        }
-
-        // ── Gold studs on rim ──
-        const numStuds  = Math.max(n * 4, 24);
-        const studRing  = outerR - rimW / 2 + 2;
-        const studRad   = 4.5;
-        for (let i = 0; i < numStuds; i++) {
-            const a  = (i / numStuds) * Math.PI * 2;
-            const sx = cx + studRing * Math.cos(a);
-            const sy = cy + studRing * Math.sin(a);
-
-            const sg = ctx.createRadialGradient(sx - 1, sy - 1, 1, sx, sy, studRad);
-            sg.addColorStop(0, '#fff9d0');
-            sg.addColorStop(1, '#b87a00');
-            ctx.beginPath();
-            ctx.arc(sx, sy, studRad, 0, Math.PI * 2);
-            ctx.fillStyle = sg;
-            ctx.fill();
-        }
-
-        // ── Center hub ──
-        // Outer dark ring
-        ctx.beginPath();
-        ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-        ctx.fillStyle = '#050f40';
-        ctx.fill();
-
-        // Gold ring
-        const hubGold = ctx.createLinearGradient(cx - 28, cy - 28, cx + 28, cy + 28);
-        hubGold.addColorStop(0, '#ffd700');
-        hubGold.addColorStop(0.5, '#ffea70');
-        hubGold.addColorStop(1, '#c8960c');
-        ctx.beginPath();
-        ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-        ctx.fillStyle = hubGold;
-        ctx.fill();
-
-        // Inner blue circle
-        ctx.beginPath();
-        ctx.arc(cx, cy, 20, 0, Math.PI * 2);
-        ctx.fillStyle = '#0d2f8e';
-        ctx.fill();
-
-        // Star icon in center
-        ctx.fillStyle = '#ffd700';
-        ctx.font = 'bold 18px Arial';
+    // Draw text across the slice (tangential), flipped on the lower half so it is never upside down
+    function radialText(ctx, text, mid, dist, size, weight, color, maxW) {
+        const flip = Math.sin(mid) > 0;
+        ctx.save();
+        ctx.rotate(flip ? mid - Math.PI / 2 : mid + Math.PI / 2);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('★', cx, cy);
-        ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = color;
+        const used = fitFont(ctx, text, maxW, size, 7, weight);
+        ctx.shadowColor = 'rgba(0,0,0,.45)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetY = 1;
+        ctx.fillText(text, 0, flip ? dist : -dist);
+        ctx.restore();
+        return used;
     }
 
-    // ── Rotation helper ──────────────────────────────────────
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    // ── The spinning part: coloured slices, icons and labels ──
+    function drawWheel() {
+        const R   = S / 2;
+        const Rw  = R - 30;             // segments stop where the gold rim starts
+        const n   = segments.length;
+        const arc = (Math.PI * 2) / n;
+
+        wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        wctx.clearRect(0, 0, S, S);
+        wctx.translate(R, R);
+
+        // Pass 1 — slice fills and dividers
+        for (let i = 0; i < n; i++) {
+            const start = i * arc;
+            const [c1, c2] = PALETTE[i % PALETTE.length];
+
+            // Slice fill: lighter at the rim, deeper near the hub
+            const g = wctx.createRadialGradient(0, 0, Rw * 0.12, 0, 0, Rw);
+            g.addColorStop(0, c2);
+            g.addColorStop(0.55, c1);
+            g.addColorStop(1, c1);
+
+            wctx.beginPath();
+            wctx.moveTo(0, 0);
+            wctx.arc(0, 0, Rw, start, start + arc);
+            wctx.closePath();
+            wctx.fillStyle = g;
+            wctx.fill();
+
+            // White divider between slices
+            wctx.save();
+            wctx.beginPath();
+            wctx.moveTo(0, 0);
+            wctx.lineTo(Rw * Math.cos(start), Rw * Math.sin(start));
+            wctx.strokeStyle = 'rgba(255,255,255,.55)';
+            wctx.lineWidth = 2;
+            wctx.stroke();
+            wctx.restore();
+        }
+
+        // Soft shading over the whole wheel for depth
+        const shade = wctx.createRadialGradient(0, -Rw * 0.3, Rw * 0.1, 0, 0, Rw);
+        shade.addColorStop(0, 'rgba(255,255,255,.14)');
+        shade.addColorStop(0.6, 'rgba(255,255,255,0)');
+        shade.addColorStop(1, 'rgba(0,0,0,.18)');
+        wctx.beginPath();
+        wctx.arc(0, 0, Rw, 0, Math.PI * 2);
+        wctx.fillStyle = shade;
+        wctx.fill();
+
+        // Pass 2 — icons, labels and ribbon, so nothing is painted over by a later slice
+        for (let i = 0; i < n; i++) {
+            const seg = segments[i];
+            const mid = i * arc + arc / 2;
+
+            // Icon, headline and sub-line. On the lower half the text flips so it stays
+            // readable, so the radii are mirrored too and the icon keeps sitting above the text.
+            const flip  = Math.sin(mid) > 0;
+            const chord = (d) => Math.max(26, 2 * d * Math.sin(arc / 2) * 0.86);
+            // The lucky slice is pushed outwards to leave room for its ribbon
+            const stack = seg.lucky ? [0.88, 0.70, 0.56] : [0.80, 0.56, 0.40];
+            const [iconF, headF, subF] = flip ? [stack[2], stack[1], stack[0]] : stack;
+
+            const iconR = Rw * iconF;
+            radialText(wctx, seg.icon, mid, iconR, Math.min(Rw * 0.15, chord(iconR) * 0.85), '400', '#fff', chord(iconR));
+
+            const headR = Rw * headF;
+            radialText(wctx, seg.head, mid, headR, seg.big ? Rw * 0.15 : Rw * 0.1, '900', '#ffffff', chord(headR));
+
+            if (seg.sub) {
+                const subR = Rw * subF;
+                radialText(wctx, seg.sub, mid, subR, Rw * 0.085, '700', '#ffffff', chord(subR));
+            }
+
+            // LUCKY PRIZE ribbon on the biggest prize
+            if (seg.lucky) {
+                const bR = Rw * 0.4;
+                wctx.save();
+                wctx.rotate(flip ? mid - Math.PI / 2 : mid + Math.PI / 2);
+                wctx.translate(0, flip ? bR : -bR);
+                wctx.rotate(-0.12);
+                const bw = Math.max(chord(bR) * 1.25, Rw * 0.42);
+                const bh = Math.max(14, Rw * 0.115);
+                roundRect(wctx, -bw / 2, -bh / 2, bw, bh, bh / 2);
+                wctx.fillStyle = '#e8243c';
+                wctx.strokeStyle = '#ffe08a';
+                wctx.lineWidth = 1.5;
+                wctx.fill();
+                wctx.stroke();
+                wctx.fillStyle = '#fff';
+                wctx.textAlign = 'center';
+                wctx.textBaseline = 'middle';
+                wctx.shadowColor = 'transparent';
+                fitFont(wctx, 'LUCKY PRIZE', bw * 0.86, bh * 0.66, 7, '900');
+                wctx.fillText('LUCKY PRIZE', 0, 0.5);
+                wctx.restore();
+            }
+        }
+    }
+
+    // ── The still part: gold rim, blinking bulbs and hub ─────
+    function drawFrame(phase) {
+        const R     = S / 2;
+        const outer = R - 1;
+        const inner = R - 30;
+
+        fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        fctx.clearRect(0, 0, S, S);
+        fctx.translate(R, R);
+
+        // Gold ring
+        const rim = fctx.createRadialGradient(0, 0, inner, 0, 0, outer);
+        rim.addColorStop(0,    '#8a5a00');
+        rim.addColorStop(0.18, '#ffe9a8');
+        rim.addColorStop(0.45, '#f0b429');
+        rim.addColorStop(0.75, '#ffd978');
+        rim.addColorStop(1,    '#9c6500');
+        fctx.beginPath();
+        fctx.arc(0, 0, outer, 0, Math.PI * 2);
+        fctx.arc(0, 0, inner, 0, Math.PI * 2, true);
+        fctx.fillStyle = rim;
+        fctx.fill('evenodd');
+
+        // Thin dark edges so the rim reads as metal
+        fctx.beginPath();
+        fctx.arc(0, 0, outer - 0.5, 0, Math.PI * 2);
+        fctx.strokeStyle = 'rgba(90,55,0,.8)';
+        fctx.lineWidth = 1.5;
+        fctx.stroke();
+        fctx.beginPath();
+        fctx.arc(0, 0, inner + 1, 0, Math.PI * 2);
+        fctx.strokeStyle = 'rgba(120,70,0,.65)';
+        fctx.lineWidth = 2;
+        fctx.stroke();
+
+        // Marquee bulbs, every other one lit
+        const bulbs  = Math.max(16, Math.min(28, segments.length * 2));
+        const bulbR  = Math.max(4, S * 0.016);
+        const ringR  = (outer + inner) / 2;
+        for (let i = 0; i < bulbs; i++) {
+            const a  = (i / bulbs) * Math.PI * 2 - Math.PI / 2;
+            const bx = ringR * Math.cos(a);
+            const by = ringR * Math.sin(a);
+            const on = (i % 2) === phase;
+
+            if (on) {
+                fctx.beginPath();
+                fctx.arc(bx, by, bulbR * 2.1, 0, Math.PI * 2);
+                fctx.fillStyle = 'rgba(255,240,170,.33)';
+                fctx.fill();
+            }
+
+            const bg = fctx.createRadialGradient(bx - bulbR * 0.35, by - bulbR * 0.35, bulbR * 0.2, bx, by, bulbR);
+            bg.addColorStop(0, on ? '#ffffff' : '#fff6d5');
+            bg.addColorStop(1, on ? '#ffd84d' : '#c89b2c');
+            fctx.beginPath();
+            fctx.arc(bx, by, bulbR, 0, Math.PI * 2);
+            fctx.fillStyle = bg;
+            fctx.fill();
+            fctx.strokeStyle = 'rgba(120,80,0,.5)';
+            fctx.lineWidth = 1;
+            fctx.stroke();
+        }
+
+        // Centre hub
+        const hubR = Math.max(26, S * 0.085);
+        fctx.beginPath();
+        fctx.arc(0, 0, hubR + 4, 0, Math.PI * 2);
+        fctx.fillStyle = 'rgba(0,0,0,.28)';
+        fctx.fill();
+
+        const hub = fctx.createLinearGradient(-hubR, -hubR, hubR, hubR);
+        hub.addColorStop(0,   '#fff7bd');
+        hub.addColorStop(0.45, '#ffd23f');
+        hub.addColorStop(1,   '#b87a00');
+        fctx.beginPath();
+        fctx.arc(0, 0, hubR, 0, Math.PI * 2);
+        fctx.fillStyle = hub;
+        fctx.fill();
+        fctx.strokeStyle = '#8a5a00';
+        fctx.lineWidth = 2;
+        fctx.stroke();
+
+        fctx.beginPath();
+        fctx.arc(0, 0, hubR * 0.62, 0, Math.PI * 2);
+        fctx.fillStyle = '#ffe9a8';
+        fctx.fill();
+
+        fctx.fillStyle = '#b87a00';
+        fctx.textAlign = 'center';
+        fctx.textBaseline = 'middle';
+        setFont(fctx, '900', hubR * 0.75);
+        fctx.fillText('★', 0, hubR * 0.04);
+    }
+
+    // ── Size the canvases to the screen (sharp on retina) ────
+    function layout() {
+        const avail = Math.min(window.innerWidth - 36, window.innerHeight - 330);
+        S = Math.max(240, Math.min(390, avail));
+        dpr = window.devicePixelRatio || 1;
+
+        stage.style.width  = S + 'px';
+        stage.style.height = S + 'px';
+
+        for (const cv of [wheelCv, frameCv]) {
+            cv.width  = Math.round(S * dpr);
+            cv.height = Math.round(S * dpr);
+            cv.style.width  = S + 'px';
+            cv.style.height = S + 'px';
+        }
+
+        drawWheel();
+        drawFrame(blinkPhase);
+    }
+
+    // Blinking bulbs
+    let blinkPhase = 0;
+    setInterval(() => {
+        blinkPhase = blinkPhase ? 0 : 1;
+        drawFrame(blinkPhase);
+    }, 550);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layout, 150);
+    });
+
+    // ── Spin ─────────────────────────────────────────────────
     function setWheelRotation(deg) {
-        canvas.style.transition = 'transform 5s cubic-bezier(.17,.67,.12,1)';
-        canvas.style.transform  = `rotate(${deg}deg)`;
+        wheelCv.style.transition = 'transform 5s cubic-bezier(.17,.67,.12,1)';
+        wheelCv.style.transform  = `rotate(${deg}deg)`;
     }
 
-    // ── Spin handler ─────────────────────────────────────────
     async function spin() {
         if (isSpinning) return;
         isSpinning = true;
         spinBtn.disabled = true;
         winnerEl.textContent = '';
-        winnerEl.className   = 'winner';
+        winnerEl.className   = '';
         statusEl.textContent = 'Spinning…';
 
         const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
@@ -522,39 +683,43 @@
             data = await res.json();
             if (!res.ok) {
                 winnerEl.textContent = data.message || 'Spin failed.';
-                winnerEl.className   = 'winner error';
+                winnerEl.className   = 'error';
                 statusEl.textContent = '';
                 isSpinning = false; spinBtn.disabled = false;
                 return;
             }
         } catch {
             winnerEl.textContent = 'Network error. Please try again.';
-            winnerEl.className   = 'winner error';
+            winnerEl.className   = 'error';
             statusEl.textContent = '';
             isSpinning = false; spinBtn.disabled = false;
             return;
         }
 
-        // Compute exact rotation to land on winning segment
-        const sliceAngle  = 360 / items.length;
-        const targetAngle = (270 - (data.prizeIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
+        // Land the winning slice under the pointer
+        const sliceAngle   = 360 / segments.length;
+        const targetAngle  = (270 - (data.prizeIndex * sliceAngle + sliceAngle / 2) + 360) % 360;
         const currentAngle = totalRotation % 360;
         let delta = targetAngle - currentAngle;
         if (delta <= 0) delta += 360;
         totalRotation += 5 * 360 + delta;
         setWheelRotation(totalRotation);
+        pointer.classList.add('ticking');
+        setTimeout(() => pointer.classList.remove('ticking'), 4600);
 
         setTimeout(() => {
-            statusEl.textContent = '🎉 Congratulations!';
-            winnerEl.textContent = `You won: ${data.prizeLabel}!`;
-            winnerEl.className   = 'winner';
+            // A zero-amount slice (e.g. "Better Luck Next Time") isn't a win
+            const isWin = Number(data.prizeAmount) > 0 || /%/.test(data.prizeLabel || '');
+            statusEl.textContent = isWin ? '🎉 Congratulations!' : '😔 Not this time';
+            winnerEl.textContent = isWin ? `You won: ${data.prizeLabel}!` : `${data.prizeLabel}`;
+            winnerEl.className   = '';
             isSpinning = false;
             spinBtn.disabled = false;
         }, 5200);
     }
 
     spinBtn.addEventListener('click', spin);
-    drawWheel();
+    layout();
 </script>
 </body>
 </html>

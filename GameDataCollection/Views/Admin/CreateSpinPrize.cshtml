@@ -14,13 +14,15 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label asp-for="Label"></label>
-                        <input asp-for="Label" class="form-control" placeholder="e.g. $25" />
+                        <input asp-for="Label" class="form-control" placeholder="e.g. $25 Free Play, 10% Extra Credit, Better Luck Next Time" />
                         <span asp-validation-for="Label" class="text-danger"></span>
+                        <small class="form-text text-muted">Shown on the wheel. A label starting with $ or ending with % gets a matching icon.</small>
                     </div>
                     <div class="form-group">
                         <label asp-for="Amount"></label>
-                        <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
+                        <small class="form-text text-muted">Enter 0 for a no-prize slice such as Better Luck Next Time, or a percentage prize.</small>
                     </div>
                     <div class="form-group">
                         <label asp-for="Weight"></label>

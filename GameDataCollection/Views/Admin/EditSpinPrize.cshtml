@@ -20,8 +20,9 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="Amount"></label>
-                        <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
+                        <small class="form-text text-muted">Enter 0 for a no-prize slice such as Better Luck Next Time, or a percentage prize.</small>
                     </div>
                     <div class="form-group">
                         <label asp-for="Weight"></label>
