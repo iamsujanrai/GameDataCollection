@@ -85,6 +85,15 @@ namespace GameDataCollection.Extension
 <p><a href='{loginUrl}'>Log in here</a></p>
 <p>Please keep this password safe and do not share it with anyone. You can change it any time from <strong>Change Password</strong> after logging in.</p>";
         }
+        public static string PasswordResetByAdminTemplate(string name, string email, string password, string? loginUrl)
+        {
+            return $@"<p>Hi {WebUtility.HtmlEncode(name)},</p>
+<p>Your Aliyah Gaming password has been reset. Use these details to log in:</p>
+<p><strong>Username:</strong> {WebUtility.HtmlEncode(email)}<br/>
+<strong>Password:</strong> {WebUtility.HtmlEncode(password)}</p>
+<p><a href='{loginUrl}'>Log in here</a></p>
+<p>Please keep this password safe. You can change it any time from <strong>Change Password</strong> after logging in.</p>";
+        }
         public static string PasswordResetTemplate(string name, string? resetUrl)
         {
             return $@"<p>Hi {WebUtility.HtmlEncode(name)},</p>

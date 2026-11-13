@@ -230,31 +230,12 @@ namespace GameDataCollection.Controllers
                 EmailConfirmed = true
             };
 
-            var password = GeneratePassword();
+            var password = PasswordGenerator.Generate();
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded) return null;
 
             await _userManager.AddToRoleAsync(user, Roles.User);
             return password;
-        }
-
-        // 10 characters with at least one uppercase, lowercase, digit and symbol (Identity's default rules).
-        // Look-alike characters such as 0/O and 1/l/I are left out so the password is easy to type.
-        private static string GeneratePassword()
-        {
-            const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-            const string lower = "abcdefghijkmnpqrstuvwxyz";
-            const string digits = "23456789";
-            const string symbols = "@#$%*!";
-
-            var chars = RandomNumberGenerator.GetItems<char>(upper + lower + digits + symbols, 6)
-                .Concat(RandomNumberGenerator.GetItems<char>(upper, 1))
-                .Concat(RandomNumberGenerator.GetItems<char>(lower, 1))
-                .Concat(RandomNumberGenerator.GetItems<char>(digits, 1))
-                .Concat(RandomNumberGenerator.GetItems<char>(symbols, 1))
-                .ToArray();
-            RandomNumberGenerator.Shuffle<char>(chars);
-            return new string(chars);
         }
 
         private static GameRecord GetGameRecordFromVM(GameRecordViewModel vm)

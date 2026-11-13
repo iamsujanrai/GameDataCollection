@@ -1,4 +1,5 @@
 ﻿using GameDataCollection.DbContext;
+using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using GameDataCollection.Services;
 using GameDataCollection.ViewModels;
@@ -144,16 +145,78 @@ namespace GameDataCollection.Controllers
                 return (regularAvailable ? 1 : 0) + granted;
             });
 
+            // Password reset is offered for ordinary users only, never for admin accounts.
+            // Accounts created before roles existed have no role, so "not an admin" is the test.
+            var adminRoleIds = (await _userManager.GetUsersInRoleAsync(Roles.Admin))
+                .Select(u => u.Id)
+                .ToHashSet();
+
             var model = new UserListViewModel
             {
                 Users = users,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
                 Search = search,
-                SpinsRemainingByUserId = spinsRemaining
+                SpinsRemainingByUserId = spinsRemaining,
+                ResettableUserIds = users
+                    .Where(u => !adminRoleIds.Contains(u.Id))
+                    .Select(u => u.Id)
+                    .ToHashSet()
             };
 
             return View(model);
+        }
+
+        // ── Reset a user's password ────────────────────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetUserPassword(string id, int page = 1, string? search = null)
+        {
+            var back = RedirectToAction(nameof(UserList), new { page, search });
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                _notyf.Error("User not found.");
+                return back;
+            }
+
+            // Users only — an admin account can't be reset from this list
+            if (await _userManager.IsInRoleAsync(user, Roles.Admin))
+            {
+                _notyf.Error("Admin passwords cannot be reset from the user list.");
+                return back;
+            }
+
+            var password = PasswordGenerator.Generate();
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
+
+            if (!result.Succeeded)
+            {
+                _notyf.Error("Could not reset password: " + string.Join(" ", result.Errors.Select(e => e.Description)));
+                return back;
+            }
+
+            // Clear any lockout from earlier failed logins
+            await _userManager.SetLockoutEndDateAsync(user, null);
+            await _userManager.ResetAccessFailedCountAsync(user);
+
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                var loginUrl = Url.Action("Login", "Login", null, Request.Scheme);
+                var to = user.Email;
+                var body = EmailSender.PasswordResetByAdminTemplate(user.FullName, to, password, loginUrl);
+
+                // Send in the background so a slow mail server doesn't hold up the page
+                _ = Task.Run(() => EmailSender.EmailSend(to, "Your Aliyah Gaming password has been reset", body));
+            }
+
+            // Shown once on the user list so the admin can pass it on if the email doesn't arrive
+            TempData["ResetUserName"] = user.FullName;
+            TempData["ResetUserEmail"] = user.Email;
+            TempData["ResetPassword"] = password;
+            return back;
         }
 
         // ── Spin Grants List ───────────────────────────────────────────

@@ -11,6 +11,21 @@
                 </a>
             </div>
 
+            @if (TempData["ResetPassword"] != null)
+            {
+                <div class="card-body pb-0">
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <h5><i class="icon fas fa-key"></i> Password reset</h5>
+                        A new password for <strong>@TempData["ResetUserName"]</strong> has been emailed to
+                        @TempData["ResetUserEmail"]. New password:
+                        <code class="ml-1">@TempData["ResetPassword"]</code>
+                        <br />
+                        <small>This is shown once, so copy it now if you need to pass it on.</small>
+                    </div>
+                </div>
+            }
+
             <!-- Search -->
             <div class="card-body pb-0">
                 <form asp-action="UserList" method="get" class="form-inline mb-3">
@@ -61,13 +76,25 @@
                                        class="btn btn-xs btn-info">
                                         <i class="fas fa-gift"></i> Grant Spins
                                     </a>
+                                    @if (Model.ResettableUserIds.Contains(user.Id))
+                                    {
+                                        <form asp-action="ResetUserPassword" method="post" class="d-inline"
+                                              onsubmit="return confirm('Reset the password for @user.FullName? A new password will be emailed to @user.Email.');">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <input type="hidden" name="page" value="@Model.CurrentPage" />
+                                            <input type="hidden" name="search" value="@Model.Search" />
+                                            <button type="submit" class="btn btn-xs btn-warning">
+                                                <i class="fas fa-key"></i> Reset Password
+                                            </button>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                         }
                         @if (!Model.Users.Any())
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-3">No users found.</td>
+                                <td colspan="5" class="text-center text-muted py-3">No users found.</td>
                             </tr>
                         }
                     </tbody>
