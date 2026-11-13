@@ -257,4 +257,4 @@ _Pvt_Extensions
 publish-output/
 
 # Files uploaded by users — these live on the server, not in git
-wwwroot/uploads/
+**/wwwroot/uploads/
