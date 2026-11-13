@@ -253,3 +253,8 @@ _Pvt_Extensions
 # JetBrains Rider
 .idea/
 *.sln.iml
+# Publish output (build artefact, rebuilt by `dotnet publish`)
+publish-output/
+
+# Files uploaded by users — these live on the server, not in git
+wwwroot/uploads/
