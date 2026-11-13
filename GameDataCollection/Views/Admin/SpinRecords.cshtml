@@ -1,14 +1,52 @@
 @model List<GameDataCollection.Models.SpinHistory>
 @{
     ViewData["Title"] = "Spin Records";
+
+    // Everyone who appears in the records, for the user filter
+    var spinUsers = Model
+        .Where(r => r.User != null)
+        .Select(r => r.User!)
+        .DistinctBy(u => u.Id)
+        .OrderBy(u => u.FullName)
+        .ToList();
 }
+
+<link rel="stylesheet" href="~/plugins/select2/css/select2.min.css" />
+<link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css" />
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i>User Spin Records</h3>
-        <div class="card-tools"></div>
+        <h3 class="card-title">
+            <i class="fas fa-sync-alt mr-2"></i>User Spin Records
+            @if (Model.Count > 0)
+            {
+                <small class="text-muted ml-2">
+                    Latest: @Model[0].SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")
+                    &mdash; @(Model[0].User?.FullName ?? "—") won @Model[0].PrizeLabel
+                </small>
+            }
+        </h3>
+        <div class="card-tools">
+            <a href="@Url.Action("SpinRecords", "Admin")" class="btn btn-sm btn-outline-primary mr-2">
+                <i class="fas fa-redo mr-1"></i>Refresh
+            </a>
+        </div>
     </div>
     <div class="card-body">
+        <div class="form-group row">
+            <label for="userFilter" class="col-sm-2 col-form-label">Filter by user</label>
+            <div class="col-sm-6">
+                <select id="userFilter" class="form-control">
+                    <option value="">-- All users --</option>
+                    @foreach (var user in spinUsers)
+                    {
+                        <option value="@user.Email">@user.FullName (@user.Email)</option>
+                    }
+                </select>
+                <small class="form-text text-muted">Start typing a name or email to search.</small>
+            </div>
+        </div>
+
         <table id="spinRecordsTbl" class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -29,7 +67,8 @@
                         <td>@(record.User?.Email ?? "—")</td>
                         <td><span class="badge badge-warning p-1">@record.PrizeLabel</span></td>
                         <td>$@record.PrizeAmount.ToString("0.00")</td>
-                        <td>@record.SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
+                        @* data-order keeps DataTables sorting by real date, not by the formatted text *@
+                        <td data-order="@record.SpunAt.Ticks">@record.SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
                     </tr>
                 }
             </tbody>
@@ -48,9 +87,10 @@
 </div>
 
 @section scripts {
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
     <script>
         $(function () {
-            $('#spinRecordsTbl').DataTable({
+            var table = $('#spinRecordsTbl').DataTable({
                 "paging": true,
                 "lengthChange": true,
                 "searching": true,
@@ -62,7 +102,19 @@
                 "dom": '<"top"f>rt<"bottom"lp><"clear">'
             });
             $('#spinRecordsTbl_filter').appendTo('.card-tools');
-            $('#spinRecordsTbl_filter input').attr('placeholder', 'Search...');
+            $('#spinRecordsTbl_filter input').attr('placeholder', 'Search name, email or prize...');
+
+            // Searchable user filter — matches the chosen user's email exactly
+            $('#userFilter').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '-- All users --',
+                allowClear: true
+            }).on('change', function () {
+                var email = $(this).val();
+                var term = email ? '^' + $.fn.dataTable.util.escapeRegex(email) + '$' : '';
+                table.column(2).search(term, true, false).draw();
+            });
         });
     </script>
 }
