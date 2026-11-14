@@ -103,7 +103,6 @@
                             <tr>
                                 <th>#</th>
                                 <th>Prize Won</th>
-                                <th>Amount</th>
                                 <th>Date &amp; Time</th>
                             </tr>
                         </thead>
@@ -114,7 +113,6 @@
                                 <tr>
                                     <td>@rowNum++</td>
                                     <td><span class="badge badge-warning p-1">@spin.PrizeLabel</span></td>
-                                    <td>$@spin.PrizeAmount.ToString("0.00")</td>
                                     <td>@spin.SpunAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</td>
                                 </tr>
                             }
