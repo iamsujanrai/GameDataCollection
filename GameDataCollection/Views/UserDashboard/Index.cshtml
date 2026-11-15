@@ -5,31 +5,23 @@
 }
 
 <div class="row">
-    <!-- Profile Card -->
+    <!-- Spins Card -->
     <div class="col-md-6 order-1">
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user mr-2"></i>My Profile</h3>
+                <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i>My Spins</h3>
             </div>
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Full Name</dt>
-                    <dd class="col-sm-8">@Model.FullName</dd>
-                    <dt class="col-sm-4">Email</dt>
-                    <dd class="col-sm-8">@Model.Email</dd>
-                    <dt class="col-sm-4">Spins Left</dt>
-                    <dd class="col-sm-8">
-                        <span class="badge badge-@(Model.SpinsRemainingToday > 0 ? "success" : "danger") p-2">
-                            @Model.SpinsRemainingToday spin@(Model.SpinsRemainingToday == 1 ? "" : "s") remaining
-                        </span>
-                        @if (Model.GrantedSpinsRemaining > 0)
-                        {
-                            <small class="text-muted ml-1">
-                                (@Model.FreeSpinsRemaining free + @Model.GrantedSpinsRemaining granted)
-                            </small>
-                        }
-                    </dd>
-                </dl>
+            <div class="card-body text-center">
+                <span class="badge badge-@(Model.SpinsRemainingToday > 0 ? "success" : "danger") p-2">
+                    @Model.SpinsRemainingToday spin@(Model.SpinsRemainingToday == 1 ? "" : "s") remaining
+                </span>
+                @if (Model.GrantedSpinsRemaining > 0)
+                {
+                    <div class="text-muted mt-1">
+                        <small>(@Model.FreeSpinsRemaining free + @Model.GrantedSpinsRemaining granted)</small>
+                    </div>
+                }
+                <div class="mt-3"></div>
                 @if (Model.SpinsRemainingToday > 0)
                 {
                     <a href="@Url.Action("Index", "Spin")" class="btn btn-warning btn-block">
