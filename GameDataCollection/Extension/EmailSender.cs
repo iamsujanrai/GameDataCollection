@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using System.Net;
+using System.Text;
 
 namespace GameDataCollection.Extension
 {
@@ -84,6 +85,28 @@ namespace GameDataCollection.Extension
 <strong>Password:</strong> {WebUtility.HtmlEncode(password)}</p>
 <p><a href='{loginUrl}'>Log in here</a></p>
 <p>Please keep this password safe and do not share it with anyone. You can change it any time from <strong>Change Password</strong> after logging in.</p>";
+        }
+        public static string AdminMessageTemplate(string name, string? message, string? imageUrl, string? chatUrl)
+        {
+            var body = new StringBuilder();
+            body.Append($"<p>Hi {WebUtility.HtmlEncode(name)},</p>");
+            body.Append("<p>You have a new message from Aliyah Gaming:</p>");
+
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                body.Append("<blockquote style='margin:0 0 1em;padding:10px 15px;border-left:4px solid #007bff;background:#f6f8fa;'>");
+                body.Append(WebUtility.HtmlEncode(message).Replace("\n", "<br/>"));
+                body.Append("</blockquote>");
+            }
+
+            if (!string.IsNullOrWhiteSpace(imageUrl))
+                body.Append($"<p><a href='{WebUtility.HtmlEncode(imageUrl)}'>View the image</a></p>");
+
+            if (!string.IsNullOrWhiteSpace(chatUrl))
+                body.Append($"<p><a href='{WebUtility.HtmlEncode(chatUrl)}'>Reply in your messages</a></p>");
+
+            body.Append("<p>Please do not reply to this email — we will not see it. Use the messages page instead.</p>");
+            return body.ToString();
         }
         public static string PasswordResetByAdminTemplate(string name, string email, string password, string? loginUrl)
         {

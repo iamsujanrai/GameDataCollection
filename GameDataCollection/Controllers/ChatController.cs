@@ -1,4 +1,5 @@
 using GameDataCollection.DbContext;
+using GameDataCollection.Extension;
 using GameDataCollection.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -171,7 +172,25 @@ namespace GameDataCollection.Controllers
                 await _hub.Clients.User(uid).SendAsync("NewMessageNotification");
             }
 
-            TempData["Success"] = $"Message sent to {userIds.Count} user(s).";
+            // Also email each recipient at their registered address
+            var recipients = await _userManager.Users
+                .Where(u => userIds.Contains(u.Id) && u.Email != null)
+                .Select(u => new { u.Email, u.FullName })
+                .ToListAsync();
+
+            var chatUrl = Url.Action("Index", "Chat", null, Request.Scheme);
+            var mails = recipients
+                .Select(r => (To: r.Email!, Body: EmailSender.AdminMessageTemplate(r.FullName ?? "there", message, null, chatUrl)))
+                .ToList();
+
+            // One background task sending in turn, so the mail server isn't hit all at once
+            _ = Task.Run(() =>
+            {
+                foreach (var mail in mails)
+                    EmailSender.EmailSend(mail.To, "New message from Aliyah Gaming", mail.Body);
+            });
+
+            TempData["Success"] = $"Message sent to {userIds.Count} user(s), and emailed to {mails.Count}.";
             return RedirectToAction(nameof(BulkMessage));
         }
 

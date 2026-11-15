@@ -96,10 +96,15 @@ namespace GameDataCollection.Hubs
             if (messages.Count > 0) await _db.SaveChangesAsync();
         }
 
-        // Emails a copy of every message sent by a user (admin replies are skipped)
+        // A message from the admin goes to the user's registered email;
+        // a message from a user is copied to the notification address.
         private async Task NotifyByEmail(ChatMessage chatMessage)
         {
-            if (Context.User!.IsInRole("Admin")) return;
+            if (Context.User!.IsInRole("Admin"))
+            {
+                await EmailMessageToUser(chatMessage);
+                return;
+            }
 
             var sender = await _db.Users.FindAsync(chatMessage.SenderId);
             var senderName = sender?.FullName ?? sender?.UserName ?? chatMessage.SenderId;
@@ -115,19 +120,35 @@ namespace GameDataCollection.Hubs
                 body.Append($"<p>{WebUtility.HtmlEncode(chatMessage.Message).Replace("\n", "<br/>")}</p>");
 
             if (!string.IsNullOrEmpty(chatMessage.ImagePath))
-            {
-                var request = Context.GetHttpContext()?.Request;
-                var imageUrl = request != null
-                    ? $"{request.Scheme}://{request.Host}{chatMessage.ImagePath}"
-                    : chatMessage.ImagePath;
-                body.Append($"<p><a href='{WebUtility.HtmlEncode(imageUrl)}'>View image</a></p>");
-            }
+                body.Append($"<p><a href='{WebUtility.HtmlEncode(AbsoluteUrl(chatMessage.ImagePath))}'>View image</a></p>");
 
             var subject = $"New chat message from {senderName}";
             var html = body.ToString();
 
             // Send in the background so the SMTP call doesn't delay the chat
             _ = Task.Run(() => EmailSender.EmailSend(NotificationEmail, subject, html));
+        }
+
+        // Emails the admin's message to the user's registered address
+        private async Task EmailMessageToUser(ChatMessage chatMessage)
+        {
+            var receiver = await _db.Users.FindAsync(chatMessage.ReceiverId);
+            if (string.IsNullOrEmpty(receiver?.Email)) return;
+
+            var to = receiver.Email;
+            var body = EmailSender.AdminMessageTemplate(
+                receiver.FullName ?? receiver.UserName ?? "there",
+                chatMessage.Message,
+                string.IsNullOrEmpty(chatMessage.ImagePath) ? null : AbsoluteUrl(chatMessage.ImagePath),
+                AbsoluteUrl("/Chat/Index"));
+
+            _ = Task.Run(() => EmailSender.EmailSend(to, "New message from Aliyah Gaming", body));
+        }
+
+        private string AbsoluteUrl(string path)
+        {
+            var request = Context.GetHttpContext()?.Request;
+            return request != null ? $"{request.Scheme}://{request.Host}{path}" : path;
         }
     }
 }
