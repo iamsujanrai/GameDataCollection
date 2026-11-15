@@ -12,5 +12,10 @@ namespace GameDataCollection.ViewModels
         public DateTime? NextSpinAvailableAt { get; set; }
         public GameRecord? GameRecord { get; set; }
         public List<SpinHistory> SpinHistory { get; set; } = new();
+
+        /// <summary>Who the dashboard message card talks to; null when no admin account exists.</summary>
+        public string? AdminId { get; set; }
+        public string? UserId { get; set; }
+        public List<ChatMessage> RecentMessages { get; set; } = new();
     }
 }

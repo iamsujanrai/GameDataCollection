@@ -47,12 +47,30 @@ namespace GameDataCollection.Controllers
                 ? await _spinService.GetNextSpinAvailableAtAsync(userId)
                 : null;
 
+            // Last few messages with the admin, for the message card
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            var adminId = admins.FirstOrDefault()?.Id;
+            var recentMessages = new List<ChatMessage>();
+            if (adminId != null)
+            {
+                recentMessages = await _db.ChatMessages
+                    .Where(m => (m.SenderId == userId && m.ReceiverId == adminId) ||
+                                (m.SenderId == adminId && m.ReceiverId == userId))
+                    .OrderByDescending(m => m.SentAt)
+                    .Take(10)
+                    .ToListAsync();
+                recentMessages.Reverse();   // oldest first, newest at the bottom
+            }
+
             var vm = new UserDashboardViewModel
             {
                 FullName = user.FullName,
                 Email = user.Email,
                 GameRecord = gameRecord,
                 SpinHistory = spinHistory,
+                AdminId = adminId,
+                UserId = userId,
+                RecentMessages = recentMessages,
                 SpinsRemainingToday = total,
                 FreeSpinsRemaining = freeSpins,
                 GrantedSpinsRemaining = grantedSpins,

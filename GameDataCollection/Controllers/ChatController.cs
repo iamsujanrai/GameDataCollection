@@ -104,6 +104,50 @@ namespace GameDataCollection.Controllers
             return View("~/Views/Admin/Chat.cshtml", messages);
         }
 
+        // ── Send to admin (used by the dashboard message card) ────────────
+        // A plain POST, so it still works when the live connection can't be made
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendToAdmin(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return BadRequest(new { error = "Message cannot be empty." });
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            var adminId = admins.FirstOrDefault()?.Id;
+            if (adminId == null)
+                return BadRequest(new { error = "No admin account found." });
+
+            var chatMessage = new ChatMessage
+            {
+                SenderId = userId,
+                ReceiverId = adminId,
+                Message = message.Trim(),
+                SentAt = DateTime.UtcNow,
+                IsRead = false
+            };
+            _db.ChatMessages.Add(chatMessage);
+            await _db.SaveChangesAsync();
+
+            var payload = new
+            {
+                id = chatMessage.Id,
+                senderId = userId,
+                message = chatMessage.Message,
+                imagePath = (string?)null,
+                sentAt = chatMessage.SentAt.ToString("hh:mm tt")
+            };
+
+            await _hub.Clients.User(adminId).SendAsync("ReceiveMessage", payload);
+            await _hub.Clients.User(adminId).SendAsync("NewMessageNotification");
+
+            var sender = await _userManager.FindByIdAsync(userId);
+            ChatMailer.QueueUserMessageCopy(chatMessage, sender, $"{Request.Scheme}://{Request.Host}");
+
+            return Json(payload);
+        }
+
         // ── Unread count (JSON) ───────────────────────────────────────────
         [HttpGet]
         public async Task<IActionResult> UnreadCount()

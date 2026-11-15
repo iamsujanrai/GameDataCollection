@@ -6,7 +6,7 @@
 
 <div class="row">
     <!-- Profile Card -->
-    <div class="col-md-6">
+    <div class="col-md-6 order-1">
         <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user mr-2"></i>My Profile</h3>
@@ -54,8 +54,74 @@
         </div>
     </div>
 
+    <!-- Messages Card — on a phone this sits right after the profile card -->
+    <div class="col-12 order-2 order-md-3">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-comments mr-2"></i>Messages</h3>
+                <div class="card-tools">
+                    <a href="@Url.Action("Index", "Chat")" class="btn btn-tool" title="Open full chat">
+                        <i class="fas fa-expand"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div id="dashChatBox" style="max-height:260px;min-height:120px;overflow-y:auto;">
+                    @if (Model.RecentMessages.Any())
+                    {
+                        foreach (var msg in Model.RecentMessages)
+                        {
+                            var mine = msg.SenderId == Model.UserId;
+                            <div class="d-flex mb-2 @(mine ? "justify-content-end" : "justify-content-start")">
+                                <div class="p-2 rounded @(mine ? "bg-primary text-white" : "bg-light")" style="max-width:80%;">
+                                    @if (!string.IsNullOrEmpty(msg.Message))
+                                    {
+                                        <div style="white-space:pre-wrap;word-break:break-word;">@msg.Message</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(msg.ImagePath))
+                                    {
+                                        <a href="@msg.ImagePath" target="_blank">
+                                            <img src="@msg.ImagePath" alt="attachment" class="img-fluid rounded" style="max-height:150px;" />
+                                        </a>
+                                    }
+                                    <small class="d-block text-right @(mine ? "text-white-50" : "text-muted")" style="font-size:11px;">
+                                        @msg.SentAt.ToLocalTime().ToString("MMM dd, hh:mm tt")
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p id="dashChatEmpty" class="text-center text-muted my-4">
+                            No messages yet. Send us a message below &mdash; we usually reply quickly.
+                        </p>
+                    }
+                </div>
+            </div>
+            <div class="card-footer p-2">
+                @if (Model.AdminId != null)
+                {
+                    <div class="d-flex">
+                        <input id="dashChatInput" type="text" class="form-control mr-2"
+                               placeholder="Type your message..." autocomplete="off" maxlength="1000" />
+                        <button id="dashChatSend" type="button" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            <span class="d-none d-sm-inline ml-1">Send</span>
+                        </button>
+                    </div>
+                    <small id="dashChatError" class="text-danger" style="display:none;"></small>
+                }
+                else
+                {
+                    <small class="text-muted">Messaging is unavailable right now.</small>
+                }
+            </div>
+        </div>
+    </div>
+
     <!-- Game Record Card -->
-    <div class="col-md-6">
+    <div class="col-md-6 order-3 order-md-2">
         <div class="card card-info">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-gamepad mr-2"></i>My Game Record</h3>
@@ -130,3 +196,108 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <script>
+        (function () {
+            var box = document.getElementById('dashChatBox');
+            var input = document.getElementById('dashChatInput');
+            var sendBtn = document.getElementById('dashChatSend');
+            var errorEl = document.getElementById('dashChatError');
+            if (!box) return;
+
+            var myId = '@Model.UserId';
+            var scrollToEnd = function () { box.scrollTop = box.scrollHeight; };
+            scrollToEnd();
+
+            function addBubble(text, imagePath, mine, timeText) {
+                var empty = document.getElementById('dashChatEmpty');
+                if (empty) empty.remove();
+
+                var row = document.createElement('div');
+                row.className = 'd-flex mb-2 ' + (mine ? 'justify-content-end' : 'justify-content-start');
+
+                var bubble = document.createElement('div');
+                bubble.className = 'p-2 rounded ' + (mine ? 'bg-primary text-white' : 'bg-light');
+                bubble.style.maxWidth = '80%';
+
+                if (text) {
+                    var body = document.createElement('div');
+                    body.style.whiteSpace = 'pre-wrap';
+                    body.style.wordBreak = 'break-word';
+                    body.textContent = text;
+                    bubble.appendChild(body);
+                }
+                if (imagePath) {
+                    var link = document.createElement('a');
+                    link.href = imagePath;
+                    link.target = '_blank';
+                    var img = document.createElement('img');
+                    img.src = imagePath;
+                    img.className = 'img-fluid rounded';
+                    img.style.maxHeight = '150px';
+                    link.appendChild(img);
+                    bubble.appendChild(link);
+                }
+
+                var time = document.createElement('small');
+                time.className = 'd-block text-right ' + (mine ? 'text-white-50' : 'text-muted');
+                time.style.fontSize = '11px';
+                time.textContent = timeText || '';
+                bubble.appendChild(time);
+
+                row.appendChild(bubble);
+                box.appendChild(row);
+                scrollToEnd();
+            }
+
+            // Live updates over the shared connection started by the layout
+            if (window.chatHubConn) {
+                window.chatHubConn.on('ReceiveMessage', function (msg) {
+                    if (msg.senderId === myId) return;      // our own messages are added on send
+                    addBubble(msg.message, msg.imagePath, false, msg.sentAt);
+                });
+            }
+
+            function send() {
+                var text = (input.value || '').trim();
+                if (!text) return;
+
+                sendBtn.disabled = true;
+                errorEl.style.display = 'none';
+
+                var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                var form = new FormData();
+                form.append('message', text);
+
+                fetch('/Chat/SendToAdmin', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token },
+                    body: form
+                })
+                .then(function (res) {
+                    if (!res.ok) throw new Error('send failed');
+                    return res.json();
+                })
+                .then(function (msg) {
+                    input.value = '';
+                    addBubble(msg.message, msg.imagePath, true, msg.sentAt);
+                })
+                .catch(function () {
+                    errorEl.textContent = 'Could not send. Please check your connection and try again.';
+                    errorEl.style.display = '';
+                })
+                .finally(function () {
+                    sendBtn.disabled = false;
+                    input.focus();
+                });
+            }
+
+            sendBtn.addEventListener('click', send);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); send(); }
+            });
+        })();
+    </script>
+}

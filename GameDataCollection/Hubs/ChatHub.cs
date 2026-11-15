@@ -4,19 +4,13 @@ using GameDataCollection.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 using System.Security.Claims;
-using System.Text;
 
 namespace GameDataCollection.Hubs
 {
     [Authorize]
     public class ChatHub : Hub
     {
-        private const string NotificationEmail = "aliyahhafeez29@gmail.com";
-        private static readonly TimeZoneInfo NepalTz =
-            TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time");
-
         private readonly UserDbContext _db;
 
         public ChatHub(UserDbContext db)
@@ -102,53 +96,19 @@ namespace GameDataCollection.Hubs
         {
             if (Context.User!.IsInRole("Admin"))
             {
-                await EmailMessageToUser(chatMessage);
+                var receiver = await _db.Users.FindAsync(chatMessage.ReceiverId);
+                ChatMailer.QueueAdminMessageToUser(chatMessage, receiver, BaseUrl());
                 return;
             }
 
             var sender = await _db.Users.FindAsync(chatMessage.SenderId);
-            var senderName = sender?.FullName ?? sender?.UserName ?? chatMessage.SenderId;
-            var sentAtNepal = TimeZoneInfo.ConvertTimeFromUtc(chatMessage.SentAt, NepalTz);
-
-            var body = new StringBuilder();
-            body.Append($"<p><strong>{WebUtility.HtmlEncode(senderName)}</strong>");
-            if (!string.IsNullOrEmpty(sender?.Email))
-                body.Append($" ({WebUtility.HtmlEncode(sender.Email)})");
-            body.Append($" sent a message on {sentAtNepal:yyyy-MM-dd hh:mm tt}:</p>");
-
-            if (!string.IsNullOrEmpty(chatMessage.Message))
-                body.Append($"<p>{WebUtility.HtmlEncode(chatMessage.Message).Replace("\n", "<br/>")}</p>");
-
-            if (!string.IsNullOrEmpty(chatMessage.ImagePath))
-                body.Append($"<p><a href='{WebUtility.HtmlEncode(AbsoluteUrl(chatMessage.ImagePath))}'>View image</a></p>");
-
-            var subject = $"New chat message from {senderName}";
-            var html = body.ToString();
-
-            // Send in the background so the SMTP call doesn't delay the chat
-            _ = Task.Run(() => EmailSender.EmailSend(NotificationEmail, subject, html));
+            ChatMailer.QueueUserMessageCopy(chatMessage, sender, BaseUrl());
         }
 
-        // Emails the admin's message to the user's registered address
-        private async Task EmailMessageToUser(ChatMessage chatMessage)
-        {
-            var receiver = await _db.Users.FindAsync(chatMessage.ReceiverId);
-            if (string.IsNullOrEmpty(receiver?.Email)) return;
-
-            var to = receiver.Email;
-            var body = EmailSender.AdminMessageTemplate(
-                receiver.FullName ?? receiver.UserName ?? "there",
-                chatMessage.Message,
-                string.IsNullOrEmpty(chatMessage.ImagePath) ? null : AbsoluteUrl(chatMessage.ImagePath),
-                AbsoluteUrl("/Chat/Index"));
-
-            _ = Task.Run(() => EmailSender.EmailSend(to, "New message from Aliyah Gaming", body));
-        }
-
-        private string AbsoluteUrl(string path)
+        private string BaseUrl()
         {
             var request = Context.GetHttpContext()?.Request;
-            return request != null ? $"{request.Scheme}://{request.Host}{path}" : path;
+            return request != null ? $"{request.Scheme}://{request.Host}" : string.Empty;
         }
     }
 }
